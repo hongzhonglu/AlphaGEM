@@ -77,7 +77,6 @@ def gapfill(name,refname):
                 model.reactions.get_by_id(re.id).compartments.add('c')
     model.optimize()
     cobra.io.write_sbml_model(model, f'models/tarmodel__{name}text.xml')
-gapfill('candida','yeast')
 
 
 

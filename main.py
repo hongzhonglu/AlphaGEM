@@ -12,12 +12,9 @@ import homolog_concat2
 import model_build1
 import model_build2
 import use_eggnog
-import kegg_find
-import model_reaction
 import nonhomogene_anno_score_from_eggandclean
 import add_nonhomo_reaction_score
 import gapfilling
-from config import refmodel
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 t1=time.time()
