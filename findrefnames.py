@@ -1,12 +1,16 @@
 import pandas as pd
-from config import refname
-df=pd.read_excel(f'ziyuan/{refname}.xlsx')
-entrys=[]
-for index,row in df.iterrows():
-    entrys.append(row.iloc[0])
-modelnames=[]
-for index,row in df.iterrows():
-    modelnames.append(row.iloc[2])
+def predata(refname):
+    global df
+    df = pd.read_excel(f'ziyuan/{refname}.xlsx')
+    global entrys
+    entrys = []
+    for index, row in df.iterrows():
+        entrys.append(row.iloc[0])
+    global modelnames
+    modelnames = []
+    for index, row in df.iterrows():
+        modelnames.append(row.iloc[2])
+
 def findmodelname(modelname):
     try:
         return df.iat[modelnames.index(modelname),0]

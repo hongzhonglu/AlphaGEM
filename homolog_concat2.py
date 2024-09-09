@@ -1,7 +1,7 @@
 import pandas as pd
-def homo():
-    gx1 = pd.read_excel('juzhen/juzhen_model1.xlsx')
-    gx4 = pd.read_excel('juzhen/juzhen_model3.xlsx')
+def homo(name):
+    gx1 = pd.read_excel(f'juzhen/juzhen_model1{name}.xlsx')
+    gx4 = pd.read_excel(f'juzhen/juzhen_model3{name}.xlsx')
     gx3 = pd.DataFrame()
     for i in range(len(gx1.index)):
         gx3 = pd.concat([gx3, pd.DataFrame({
@@ -20,4 +20,4 @@ def homo():
             1: [gx4.iat[i, 2]]
         })])
     gx3.index = range(len(gx3.index))
-    gx3.to_excel('juzhen/juzhen_homolog.xlsx')
+    gx3.to_excel(f'juzhen/juzhen_homolog{name}.xlsx')

@@ -21,8 +21,8 @@ def foldseekfind(path_taryeast_structure='',name='',refname=''):
     def bidui():
         global df_foldseek_find
         os.system(
-            f'{pathwd}/tools/foldseek/bin/foldseek easy-search {pathwd}/struct_data/{refname} {pathwd}/struct_data/taryeast/{name}db/{name}db {pathwd}/data/aln.csv tmpFolder --format-output "query,target,alntmscore,prob,qcov,tcov" --alignment-type 2')
-        aln = pd.read_csv(f'{pathwd}/data/aln.csv',sep='\t',names=['ref','tar','tms','pro','rcov','tcov'])
+            f'{pathwd}/tools/foldseek/bin/foldseek easy-search {pathwd}/struct_data/{refname} {pathwd}/struct_data/taryeast/{name}db/{name}db {pathwd}/data/aln{name}.csv tmpFolder --format-output "query,target,alntmscore,prob,qcov,tcov" --alignment-type 2')
+        aln = pd.read_csv(f'{pathwd}/data/aln{name}.csv',sep='\t',names=['ref','tar','tms','pro','rcov','tcov'])
         aln2 = aln[aln['pro'] >= 1]
         aln2['ref']=aln2['ref'].apply(lambda x:x[3:x.rfind('-F1-')])
         aln2['tar']=aln2['tar'].apply(lambda x: x[3:x.rfind('-F1-')])
@@ -37,8 +37,8 @@ def foldseekfind(path_taryeast_structure='',name='',refname=''):
                 return yea.iat[i, 0]
         return 0
 
-    shutil.copy(f'{pathwd}/data/alno/aln.csv', f'{pathwd}/data/aln.csv')
+    shutil.copy(f'{pathwd}/data/alno/aln.csv', f'{pathwd}/data/aln{name}.csv')
     bidui()
-    df_foldseek_find.to_excel('juzhen/juzhen4.xlsx')
+    df_foldseek_find.to_excel(f'juzhen/juzhen4{name}.xlsx')
     stop_time = time.time()
     print('the time that cost is' + str(stop_time - start_time))

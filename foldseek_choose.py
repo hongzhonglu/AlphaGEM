@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 from plddt_find import get_plddt_from_pdb as gpl
-def read_gx():
+def read_gx(name):
     global gx
-    gx = pd.read_excel('juzhen/juzhen4.xlsx')
+    gx = pd.read_excel(f'juzhen/juzhen4{name}.xlsx')
 gx2=pd.DataFrame()
 
 def tdblast(cmd1,cmd2,i,name,refname,path=''):
@@ -34,8 +34,8 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
         7:[d]
     })])
 def foldseek_choose(name,refname,path):
-    read_gx()
+    read_gx(name)
     for i in range(len(gx.index)):
         tdblast(gx.iat[i, 1], gx.iat[i, 2], i, name,refname, path)
     print(gx2)
-    gx2.to_excel('juzhen/juzhen4+ee.xlsx')
+    gx2.to_excel(f'juzhen/juzhen4+ee{name}.xlsx')

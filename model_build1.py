@@ -2,14 +2,15 @@ import cobra
 import pandas as pd
 import numpy as np
 import time
-canmod = cobra.Model('tar_model')
-def gx_get():
+
+
+def gx_get(name):
     global gx3
-    gx3 = pd.read_excel('juzhen/juzhen_homolog.xlsx')
+    gx3 = pd.read_excel(f'juzhen/juzhen_homolog{name}.xlsx')
+    return gx3
 m = 0
 allgenes=[]
 gx4=[]
-cangenes = pd.DataFrame(np.zeros((5000, 1)))
 def tianjia(rule,gene1,gene2):
     if genefind(rule,gene1)=='':
         return rule
@@ -103,8 +104,16 @@ def qiaochu(rule, gene,n):
     elif rule.find(f'{gene}') == -1:
         return rule
 
-def premodel():
-    global canmod
+def pregenes(cangenes,canmod):
+    global gx4
+    for a in range(len(canmod.genes)):
+        cangenes.append(canmod.genes[a].id)
+    for i in range(len(gx3.index)):
+        gx4.append(gx3.iat[i, 1])
+    return cangenes
+
+
+def premodel(ymod,canmod,cangenes):
     for i in ymod.genes:
         allgenes.append(i.id)
     for a in range(len(allgenes)):
@@ -146,11 +155,10 @@ def gpr_tissue_solve():
         if ymod.reactions[i].gene_reaction_rule[:a].count('(')!=ymod.reactions[i].gene_reaction_rule[:a].count(')') and a!=-1:
            ymod.reactions[i].gene_reaction_rule=ymod.reactions[i].gene_reaction_rule[1:-1]
 
-def change_gpr_forsco():
-    global canmod
+def change_gpr_forsco(canmod,cangenes):
     print('start change gpr')
-    for a in range(len(cangenes.index)):
-        if cangenes.iat[a, 0] == 0:
+    for a in range(len(cangenes)):
+        if cangenes[a] == 0:
             break
         pan = 0
         n2 = 0
@@ -158,7 +166,7 @@ def change_gpr_forsco():
         while True:
             rule_pre=''
             try:
-                i = gx4[i + 1:].index(cangenes.iat[a, 0]) + i + 1
+                i = gx4[i + 1:].index(cangenes[a]) + i + 1
                 pan += 1
             except:
                 break
@@ -168,51 +176,56 @@ def change_gpr_forsco():
             if pan > 1:
                 rule_pre=rule_pre+' or '+gx3.iat[i, 2]
             for n1 in range(len(canmod.reactions)):
-                if cangenes.iat[a, 0] in canmod.reactions[n1].gene_reaction_rule:
-                    canmod.reactions[n1].gene_reaction_rule = canmod.reactions[n1].gene_reaction_rule.replace(cangenes.iat[a, 0],'('+rule_pre+')')
+                if cangenes[a] in canmod.reactions[n1].gene_reaction_rule:
+                    canmod.reactions[n1].gene_reaction_rule = canmod.reactions[n1].gene_reaction_rule.replace(cangenes[a],'('+rule_pre+')')
+    return canmod
 
-def change_gpr():
-    global canmod
+
+def change_gpr(canmod,cangenes):
     print('start change gpr')
-    for a in range(len(cangenes.index)):
-        if cangenes.iat[a, 0] == 0:
+    for a in range(len(cangenes)):
+        if cangenes[a] == 0:
             break
         pan = 0
         n2 = 0
         i = -1
         while True:
             try:
-                i = gx4[i + 1:].index(cangenes.iat[a, 0]) + i + 1
+                i = gx4[i + 1:].index(cangenes[a]) + i + 1
                 pan += 1
             except:
                 break
             if pan == 1:
                 n2 = i
                 for n1 in range(len(canmod.reactions)):
-                    if cangenes.iat[a, 0] in canmod.reactions[n1].gene_reaction_rule:
+                    if cangenes[a] in canmod.reactions[n1].gene_reaction_rule:
                        canmod.reactions[n1].gene_reaction_rule = gswitch(canmod.reactions[n1].gene_reaction_rule,
-                                                                      cangenes.iat[a, 0], gx3.iat[i, 2])
+                                                                      cangenes[a], gx3.iat[i, 2])
             if pan > 1:
                 for n1 in range(len(canmod.reactions)):
                     if gx3.iat[n2, 2] in canmod.reactions[n1].gene_reaction_rule:
                        canmod.reactions[n1].gene_reaction_rule = tianjia(canmod.reactions[n1].gene_reaction_rule,
                                                                       gx3.iat[n2, 2], gx3.iat[i, 2])
+    return canmod
 
 def modelbuild(refmodel,name=''):
+    cangenes = []
+    canmod = cobra.Model(f'{name}_model')
     global ymod
     if refmodel=='yeast-GEM.xml' or refmodel=='Sco-GEM.xml' or refmodel=='Human-GEM.xml':
         ymod = cobra.io.read_sbml_model(f'models/{refmodel}')
     if refmodel=='iML1515.json':
         ymod = cobra.io.load_json_model(f'models/{refmodel}')
-    gx_get()
+    gx_get(name)
     start_time=time.time()
     if refmodel=='iML1515.json':gpr_tissue_solve()
-    premodel()
+    premodel(ymod,canmod,cangenes)
+    cangenes = pregenes(cangenes,canmod)
     #delete_or()
     if refmodel!='Sco-GEM.xml':
-        change_gpr()
+        canmod=change_gpr(canmod,cangenes)
     else:
-        change_gpr_forsco()
+        canmod=change_gpr_forsco(canmod,cangenes)
     cobra.io.write_sbml_model(canmod, f'models/tarmod{name}.xml')
     end_time = time.time()
     print('the time it cost is' + str(end_time - start_time) + 's')

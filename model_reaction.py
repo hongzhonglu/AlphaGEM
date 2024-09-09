@@ -7,6 +7,18 @@ import numpy as np
 import time
 import random
 cpd=pd.read_excel('ziyuan/cpd.xlsx')
+def check_reactions(reac,model):
+    result={}
+    for met in reac:
+        metvalue=reac[met]
+        metabolite=model.metabolites.get_by_id(met).elements
+        result={k: result.get(k, 0) + metvalue*metabolite.get(k, 0) for k in set(result) | set(metabolite)}
+    print(result)
+    for i in result:
+        if result[i]!=0:
+            return 0
+    return 1
+
 def find_tarname(name,strr):
     global cpd
     if np.sum(cpd['ID'].str.find(strr)!=-1)!=0:
@@ -44,8 +56,8 @@ def modelreaction(name):
     K = KEGG()
     global cpd
     model = io.load_yaml_model(f'models/tarmodel{name}.yml')
-    reactions = pd.read_excel('juzhen/reactions_kegg.xlsx')
-    gpr = pd.read_excel('juzhen/gpr.xlsx')
+    reactions = pd.read_excel(f'juzhen/reactions_kegg{name}.xlsx')
+    gpr = pd.read_excel(f'juzhen/gpr{name}.xlsx')
     model_reaction = []
     for i in model.metabolites:
         model_reaction.append(i.name)
@@ -66,12 +78,16 @@ def modelreaction(name):
         for metb in metb_left:
             model_reaction = []
             for i in model.metabolites:
-                model_reaction.append(i.name)
+                model_reaction.append(i.name.lower())
             time.sleep(random.random() * 5)
             metb = metb.replace('(n-2)', '2').replace('(m)', '').replace('(n+2)', '6').replace('(n-', '').replace('n ',
                                                                                                                   '4').replace(
                 'n', '').replace('()', '').replace('(', '')
-            metb_list = re.findall(r'(\d*\.?\d*[a-z]*)?\s*(\S+)', metb.replace(' ', ''))[0]
+            try:
+                metb_list = re.findall(r'(\d*\.?\d*[a-z]*)?\s*(\S+)', metb.replace(' ', ''))[0]
+            except:
+                pan=1
+                break
             met_id = metb_list[1]
             try:
                 metb_name = find_tarname('NAME', met_id)
@@ -87,8 +103,8 @@ def modelreaction(name):
                 )
                 try:
                     rule = model.metabolites[model_reaction.index(metb_name)].id
-                    if metb_formula != model.metabolites[
-                        model_reaction.index(metb_name)].formula and metb_weather == 'no':
+                    if model.metabolites[
+                        model_reaction.index(metb_name)].compartment=='c':
                         try:
                             rule = model.metabolites[model_reaction.index(metb_name.lower())].id
                             if not metb_list[0]:
@@ -140,11 +156,15 @@ def modelreaction(name):
         for metb in metb_right:
             model_reaction = []
             for i in model.metabolites:
-                model_reaction.append(i.name)
+                model_reaction.append(i.name.lower())
             metb = metb.replace('(n-2)', '2').replace('(m)', '').replace('(n+2)', '6').replace('(n-', '').replace('n ',
                                                                                                                   '4').replace(
                 'n', '').replace('()', '').replace('(', '')
-            metb_list = re.findall(r'(\d*\.?\d*[a-z]*)?\s*(\S+)', metb.replace(' ', ''))[0]
+            try:
+                metb_list = re.findall(r'(\d*\.?\d*[a-z]*)?\s*(\S+)', metb.replace(' ', ''))[0]
+            except:
+                pan=1
+                break
             met_id = metb_list[1]
             try:
                 metb_name = find_tarname('NAME', met_id)
@@ -161,7 +181,7 @@ def modelreaction(name):
                 try:
                     rule = model.metabolites[model_reaction.index(metb_name)].id
                     if metb_formula != model.metabolites[
-                        model_reaction.index(metb_name)].formula and metb_weather == 'no':
+                        model_reaction.index(metb_name)].compartment=='c':
                         try:
                             rule = model.metabolites[model_reaction.index(metb_name.lower())].id
                             print(rule)
@@ -213,6 +233,8 @@ def modelreaction(name):
                 print(e)
                 break
         if pan == 0:
+            if check_reactions(reac_metabolic,model)==0:
+                continue
             model.add_reactions([Reaction])
             Reaction.add_metabolites(reac_metabolic)
             Reaction.gene_reaction_rule = gpr.iat[list(gpr['reaction']).index(Reaction.id), 2]

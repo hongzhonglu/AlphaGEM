@@ -1,6 +1,7 @@
 import re
 import re
-
+import cobra
+import cobra.io
 import pandas as pd
 
 
@@ -30,7 +31,7 @@ logic_expr = '(A and B) or (C and (D or E)) or (F and G)'
 new_logic_expr = distribute_or_over_and(logic_expr)
 print(new_logic_expr)
 
-
+model=cobra.io.read_sbml_model('models/Human-GEM.xml')
 df=pd.DataFrame()
 for genes in model.genes:
     try:
@@ -38,3 +39,27 @@ for genes in model.genes:
     except:
         df = pd.concat(
             [df, pd.DataFrame({'genename': genes.id, 'uniprot': genes.annotation.get('uniprot')[0]}, index=[1])])
+genenames=[]
+for i in range(len(df.index)):
+    genenames.append(df.iat[i,1])
+df2=pd.read_excel('ziyuan/human.xlsx')
+for i in range(len(df2.index)):
+    try:
+        df2.iat[i,2]=df.iat[genenames.index(df2.iat[i,0]),0]
+    except:
+        continue
+df2=df2.dropna(subset=['Gene Name'], how='all')
+
+from Bio import SeqIO
+file='ziyuan/human.fasta'
+seqs=SeqIO.parse(file,'fasta')
+records=[x for x in seqs]
+records2=[]
+for i in records:
+    try:
+        genenames.index(i.id.split('|')[1])
+        records2.append(i)
+    except:
+        continue
+SeqIO.write(records2,file,'fasta')
+

@@ -5,18 +5,19 @@ import shutil
 def datahandel(name='',refname=''):
     orth = pd.DataFrame()
     path=os.getcwd()
-    fasta=os.listdir(f'{path}/orth/data')
+    os.mkdir(f'{path}/orth/data/{name}')
+    fasta=os.listdir(f'{path}/orth/data/{name}')
     for i in fasta[0:-1]:
         try:
-          os.remove(os.path.join(path+'/orth/data',i))
+          os.remove(os.path.join(path+f'/orth/data/{name}',i))
         except:
             continue
 
-    shutil.copy(f'ziyuan/{refname}.fasta', f'orth/data/z-{refname}.fasta')
-    shutil.copy(f'ziyuan/{name}.fasta', f'orth/data/a-{name}.fasta')
+    shutil.copy(f'ziyuan/{refname}.fasta', f'orth/data/{name}/z-{refname}.fasta')
+    shutil.copy(f'ziyuan/{name}.fasta', f'orth/data/{name}/a-{name}.fasta')
     os.system(
-        f'{path}/tools/OrthoFinder/orthofinder -f {path}/orth/data/')
-    pathresult=f'{path}/orth/data/OrthoFinder/'+os.listdir(f'{path}/orth/data/OrthoFinder/')[0]+'/Orthogroups/Orthogroups.tsv'
+        f'{path}/tools/OrthoFinder/orthofinder -f {path}/orth/data/{name}' )
+    pathresult=f'{path}/orth/data/{name}/'+os.listdir(f'{path}/orth/data/{name}/')[0]+'/Orthogroups/Orthogroups.tsv'
     with open(
            pathresult) as orth1:  # key is the result of orthofinder
         orth2 = orth1.read()
@@ -82,4 +83,4 @@ def datahandel(name='',refname=''):
             except:
                 continue
     print(yea)
-    juzhen1.to_excel('juzhen/juzhen1.xlsx')
+    juzhen1.to_excel(f'juzhen/juzhen1{name}.xlsx')

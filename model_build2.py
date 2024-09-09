@@ -8,7 +8,7 @@ def modelbuild(refmodel,name):
     if refmodel=='iML1515.json':
         ymod=cobra.io.load_json_model(f'models/{refmodel}')
     tarmodel = cobra.Model('Target_model')
-    juzhen1 = pd.read_excel('juzhen/juzhen_homolog.xlsx')
+    juzhen1 = pd.read_excel(f'juzhen/juzhen_homolog{name}.xlsx')
     juzhen2 = []
     juzhen3 = []
     juzhen4 = []
