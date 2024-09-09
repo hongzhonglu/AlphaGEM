@@ -1,9 +1,9 @@
 import pandas as pd
 import os
 from plddt_find import get_plddt_from_pdb as gpl
-def read_gx():
+def read_gx(name):
     global gx
-    gx = pd.read_excel('juzhen/juzhen1.xlsx')
+    gx = pd.read_excel(f'juzhen/juzhen1{name}.xlsx')
 
 def tdblast(cmd1,cmd2,i,name,refname,path=''):
     pathwd=os.getcwd()
@@ -48,7 +48,7 @@ def duiying1(a,yea):
     for i in range(len(yea.index)):
         if a==yea.iat[i,2]:
             return yea.iat[i,0]
-    return 0
+    return a
 def duiying2(a,tar):
     for i in range(len(tar.index)):
         if a==tar.iat[i,1]:
@@ -57,11 +57,12 @@ def duiying2(a,tar):
 
 def US_align_find(name,path,refname,path2):
     yea = pd.read_excel(f'ziyuan/{refname}.xlsx')
-    read_gx()
+    read_gx(name)
     gx2 = pd.DataFrame()
     tar = pd.read_excel(f'ziyuan/{name}.xlsx')
+    print('start usalign alignment')
     for i in range(len(gx.index)):
         gx2 = pd.concat([gx2, tdblast(duiying1(gx.iat[i, 1],yea), gx.iat[i, 2], i,name,refname,path)])
     gx2.index=range(len(gx2.index))
     print(gx2)
-    gx2.to_excel('juzhen/juzhen2.xlsx')
+    gx2.to_excel(f'juzhen/juzhen2{name}.xlsx')

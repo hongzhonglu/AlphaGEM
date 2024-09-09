@@ -1,7 +1,7 @@
 import pandas as pd
-def US_align_choose():
+def US_align_choose(name):
     gx3 = pd.DataFrame()
-    gx2 = pd.read_excel('juzhen/juzhen2.xlsx')
+    gx2 = pd.read_excel(f'juzhen/juzhen2{name}.xlsx')
     a = 0
     for i in range(len(gx2.index)):
         if gx2.iat[i, 3] + gx2.iat[i, 4] >= 1.2 or gx2.iat[i, 5] + gx2.iat[i, 6] <= 1.4 or gx2.iat[i, 4] == '':
@@ -13,4 +13,4 @@ def US_align_choose():
                                                 5: [gx2.iat[i, 6]]
                                                 })])
             a += 1
-    gx3.to_excel('juzhen/juzhen_model1.xlsx')
+    gx3.to_excel(f'juzhen/juzhen_model1{name}.xlsx')

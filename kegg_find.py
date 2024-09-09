@@ -6,10 +6,10 @@ def find_tarname(name,strr):
             return i[12:]
     return 'none'
 
-def reaction_get():
+def reaction_get(name):
     K = KEGG()
     reactions=[]
-    reaction=pd.read_excel('juzhen/eggec2.xlsx')
+    reaction=pd.read_excel(f'juzhen/eggec2{name}.xlsx')
     for i in range(len(reaction.index)):
          reactions+=reaction.iat[i,3].split(',')
     reactions=list(set(reactions))
@@ -41,10 +41,10 @@ def reaction_get():
         if n2==n1:
             break
         n2=n1
-    reactions2.to_excel('juzhen/reactions_kegg.xlsx')
+    reactions2.to_excel(f'juzhen/reactions_kegg{name}.xlsx')
 def genes_get(name):
     reactions = []
-    reaction = pd.read_excel('juzhen/eggec2.xlsx')
+    reaction = pd.read_excel(f'juzhen/eggec2{name}.xlsx')
     for i in range(len(reaction.index)):
         reactions += reaction.iat[i, 3].split(',')
     reactions = list(set(reactions))
@@ -57,7 +57,7 @@ def genes_get(name):
                 'reaction':i
             },index=[0])])
     gene_reaction_rule2=gene_reaction_rule.groupby('reaction')['genes'].apply(lambda x:' or '.join(x)).reset_index()
-    gene_reaction_rule2.to_excel('juzhen/gpr.xlsx')
+    gene_reaction_rule2.to_excel(f'juzhen/gpr{name}.xlsx')
 
 
 

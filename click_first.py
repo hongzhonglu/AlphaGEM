@@ -1,10 +1,9 @@
 import pandas as pd
-import config
 import numpy as np
 def click_first(name):
     juzhen2 = pd.DataFrame()
     taryeast = pd.read_excel(f'ziyuan/{name}.xlsx')
-    juzhen1 = pd.read_excel('juzhen/juzhen_model1.xlsx')
+    juzhen1 = pd.read_excel(f'juzhen/juzhen_model1{name}.xlsx')
     kkkk = []
     for i in range(len(juzhen1.index)):
         kkkk.append(juzhen1.iat[i, 2])
@@ -16,4 +15,4 @@ def click_first(name):
         if pan == 0:
             juzhen2 = pd.concat([juzhen2, pd.DataFrame([taryeast.iat[i, 0]])])
     juzhen2.index = range(len(juzhen2.index))
-    juzhen2.to_excel('juzhen/juzhen_1stkout.xlsx')
+    juzhen2.to_excel(f'juzhen/juzhen_1stkout{name}.xlsx')

@@ -5,8 +5,9 @@ import os
 from Bio import SeqIO
 import findrefnames
 import model_build1
-def read_gapgenes(model,genes,solution):
-    df=pd.read_csv('ziyuan/outfile.csv',sep='\t',names=range(12))
+def read_gapgenes(model,genes,solution,refname,name):
+    findrefnames.predata(refname)
+    df=pd.read_csv(f'ziyuan/outfile{name}.csv',sep='\t',names=range(12))
     for gene in genes:
         try:
             newgenename=df.iat[list(df[0]).index(gene),1].split('|')[1]
@@ -30,6 +31,7 @@ def gapfill(name,refname):
     if refname=='human':
         refmodel = cobra.io.read_sbml_model('models/Human-GEM.xml')
     solution=[]
+    findrefnames.predata(refname)
     model = cobra.io.load_yaml_model(f'models/tarmodel_{name}.yml')
     gap = gapfilling.GapFiller(model, universal=refmodel, integer_threshold=1e-12, demand_reactions=False,lower_bound=0.05)
     for j in gap.indicators:
@@ -55,15 +57,27 @@ def gapfill(name,refname):
             except:
                 continue
     model.add_reactions(reacgaps)
+    model.optimize()
     if len(targenes)!=0:
        SeqIO.write(targenes,fastafile,'fasta')
        fastafile.close()
        os.system(f'diamond makedb --in ziyuan/{name}.fasta --db ziyuan/{name}db')
-       os.system(f'diamond blastp -q ziyuan/{refname}_gap.fasta -d ziyuan/{name}db --out ziyuan/outfile.csv')
-    model=read_gapgenes(model=model,genes=[x.id for x in targenes],solution=[reac.id for reac in reacgaps])
-    #####在有基因的情况下，若不匹配，则敲除基因与反应，目前已经得到文件，后续需要读取文件，对命名进行处理，以及进行查找是否存在
-
-    print(model.optimize())
+       os.system(f'diamond blastp -q ziyuan/{refname}_gap.fasta -d ziyuan/{name}db --out ziyuan/outfile{name}.csv')
+    print([x.id for x in targenes])
+    model=read_gapgenes(model=model,genes=[x.id for x in targenes],solution=[reac.id for reac in reacgaps],refname=refname,name=name)
+    model.optimize()
+    print([reac.id for reac in reacgaps])
+    for met in model.metabolites:
+        if met.compartment == '':
+            model.metabolites.get_by_id(met.id).compartment = 'c'
+    for re in model.reactions:
+        for cp in re.compartments:
+            if cp == '':
+                model.reactions.get_by_id(re.id).compartments.remove('')
+                model.reactions.get_by_id(re.id).compartments.add('c')
+    model.optimize()
     cobra.io.write_sbml_model(model, f'models/tarmodel__{name}text.xml')
+
+
 
 

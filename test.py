@@ -12,16 +12,21 @@ with open('ziyuan/chem_xref.tsv', 'r') as f:
 rxn=pd.DataFrame()
 for i in row2:
     rxn=pd.concat([rxn,np.transpose(pd.DataFrame(i.replace('kegg.compound:','').split('\t')))])
+
+
+
+
+
 with open('ziyuan/chem_prop.tsv','r') as f:
     reader=csv.reader(f)
     row3=[]
     for row in reader:
+        print(row)
         if 'keggC' in ','.join(row):
           row3.append(','.join(row).replace('keggC:',''))
     row31=pd.DataFrame()
     for row in row3:
         row31 = pd.concat([row31, np.transpose(pd.DataFrame(row.split('\t')))])
-        print(row)
 row31.drop(5,axis=1,inplace=True)
 row31.drop(6,axis=1,inplace=True)
 row31.drop(7,axis=1,inplace=True)
