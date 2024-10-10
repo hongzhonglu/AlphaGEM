@@ -4,7 +4,7 @@ def US_align_choose(name):
     gx2 = pd.read_excel(f'juzhen/juzhen2{name}.xlsx')
     a = 0
     for i in range(len(gx2.index)):
-        if gx2.iat[i, 3] + gx2.iat[i, 4] >= 1.2 or gx2.iat[i, 5] + gx2.iat[i, 6] <= 1.4 or gx2.iat[i, 4] == '':
+        if gx2.iat[i, 3] + gx2.iat[i, 4] >= 1.4 or gx2.iat[i, 5] + gx2.iat[i, 6] <= 1.6 or gx2.iat[i, 4] == '':
             gx3 = pd.concat([gx3, pd.DataFrame({0: [gx2.iat[i, 1]],
                                                 1: [gx2.iat[i, 2]],
                                                 2: [gx2.iat[i, 3]],

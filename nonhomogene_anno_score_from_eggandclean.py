@@ -5,9 +5,9 @@ import cobra
 
 def calculate_score(row):
     if pd.notnull(row['anno_B']):
-        return row['score'] * 0.8 + 0.2
+        return row['score'] * 0.85 + 0.2
     else:
-        return row['score'] * 0.8
+        return row['score'] * 0.85
 
 
 def findtargetreaction(g, ec):
@@ -31,7 +31,7 @@ def nonhome(name,clean_use):
     g=Graph()
     g.parse('rhea.rdf', format='xml')
     kegg2rhea = pd.read_csv('ziyuan/rhea2kegg_reaction.tsv', sep='\t')
-    keggdict = kegg2rhea.set_index('ID')['RHEA_ID'].to_dict()
+    keggdict = kegg2rhea.set_index('ID')['MASTER_ID'].to_dict()
     egg = pd.read_excel(f'juzhen/eggec2{name}.xlsx')
     eggec = pd.DataFrame()
     for genes in range(len(egg.index)):
@@ -69,10 +69,10 @@ def nonhome(name,clean_use):
                                                   index=[1])])
         merged = pd.merge(cleanecrhea, eggec, how='outer', on=['reaction', 'rhea'], suffixes=('_A', '_B'))
         merged['final_score'] = merged.apply(calculate_score, axis=1)
-        merged['final_score']=merged['final_score'].fillna(0.5, inplace=True)
+        merged['final_score'].fillna(0.75, inplace=True)
         reaction_counts = merged['reaction'].value_counts()
         merged['final_score'] += merged['reaction'].apply(lambda x: 0.3 if reaction_counts[x] == 1 else 0)
+        merged.to_excel(f'juzhen/{name}eggnog&clean_score.xlsx', index=False)
         resultec=merged[merged['final_score'] >= 0.75].reset_index(drop=True)
-        resultec.to_excel(f'juzhen/{name}eggnog&clean_score.xlsx', index=False)
     result = resultec.groupby('rhea')['reaction'].apply(lambda x: ' or '.join(x)).reset_index()
     result.to_excel(f'juzhen/{name}gpr_score.xlsx')

@@ -39,7 +39,7 @@ def eggnog(name,refname,i=1):
     genes.index = range(len(genes.index))
     for i in range(len(genes.index)):
         try:
-            genes.iat[i, 0] = genes.iat[i, 0].split('|')[2]
+            genes.iat[i, 0] = genes.iat[i, 0].split('|')[1]
         except:
             continue
     genes1 = []

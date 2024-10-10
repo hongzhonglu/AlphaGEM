@@ -12,7 +12,7 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
         path=f'{pathwd}/struct_data/taryeast/{name}'
     global gx2
     global gx
-    if gx.iat[i,5]<=0.7 or gx.iat[i,6]<=0.7:
+    if gx.iat[i,5]<=0.8 or gx.iat[i,6]<=0.8:
         return 0
     d=gpl(f'{path}/AF-{cmd2}-F1-model_v4.pdb')
     c=gpl(
@@ -33,7 +33,7 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
         6:[c],
         7:[d]
     })])
-def foldseek_choose(name,refname,path):
+def foldseek_choose(name,refname,path=''):
     read_gx(name)
     for i in range(len(gx.index)):
         tdblast(gx.iat[i, 1], gx.iat[i, 2], i, name,refname, path)

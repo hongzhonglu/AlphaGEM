@@ -33,6 +33,8 @@ def gapfill(name,refname):
     solution=[]
     findrefnames.predata(refname)
     model = cobra.io.load_yaml_model(f'models/tarmodel_{name}.yml')
+    if refname == 'human':
+        model.objective=model.reactions.MAR00021
     gap = gapfilling.GapFiller(model, universal=refmodel, integer_threshold=1e-12, demand_reactions=False,lower_bound=0.05)
     for j in gap.indicators:
         i=gap.model.variables.get(key=j.rxn_id)

@@ -23,7 +23,7 @@ def add_bireaction(g,enzyme_c,keggdict,model,gpr,model_met_exist,kegg2name,model
     SELECT DISTINCT ?x ?reaction
     WHERE {{
       ?x rdfs:subClassOf rh:Reaction ;
-         rh:bidirectionalReaction <http://rdf.rhea-db.org/{enzyme_c}>;
+         rh:accession 'RHEA:{enzyme_c}';
          rh:side ?reaction .
     }}
     LIMIT 100
