@@ -4,24 +4,27 @@ import cobra
 import os
 from Bio import SeqIO
 import findrefnames
-import model_build1
+import pickle
+
+
+
 def read_gapgenes(model,genes,solution,refname,name):
     findrefnames.predata(refname)
-    df=pd.read_csv(f'ziyuan/outfile{name}.csv',sep='\t',names=range(12))
+    df=pd.read_csv(f'working/{name}/outfile{name}.csv',sep='\t',names=range(12))
+    nonfindgenes=[]
     for gene in genes:
         try:
             newgenename=df.iat[list(df[0]).index(gene),1].split('|')[1]
             for solution1 in solution:
                 try:
                    model.reactions.get_by_id(solution1).gene_reaction_rule=model.reactions.get_by_id(solution1).gene_reaction_rule.replace(findrefnames.findentryname(gene.split('|')[1]),newgenename)
-                   print(model.reactions.get_by_id(solution1).gene_reaction_rule)
                 except:
                     continue
         except:
-            continue
-    return model
+            nonfindgenes.append(findrefnames.findentryname(gene.split('|')[1]))
+    return model,nonfindgenes
 
-def gapfill(name,refname):
+def gapfill(name,refname,grothmedium='min'):
     if refname=='yeast':
         refmodel = cobra.io.read_sbml_model('models/yeast-GEM.xml')
     if refname=='ecoli':
@@ -30,55 +33,110 @@ def gapfill(name,refname):
         refmodel=cobra.io.read_sbml_model('models/Sco-GEM.xml')
     if refname=='human':
         refmodel = cobra.io.read_sbml_model('models/Human-GEM.xml')
-    solution=[]
     findrefnames.predata(refname)
-    model = cobra.io.load_yaml_model(f'models/tarmodel_{name}.yml')
-    if refname == 'human':
-        model.objective=model.reactions.MAR00021
-    gap = gapfilling.GapFiller(model, universal=refmodel, integer_threshold=1e-12, demand_reactions=False,lower_bound=0.05)
-    for j in gap.indicators:
-        i=gap.model.variables.get(key=j.rxn_id)
-        if i._get_primal() >=0:
-            solution.append(i.name)
-    for solution1 in solution:
-        model.add_reactions([gap.model.reactions.get_by_id(solution1)])
-    fba = model.optimize()
-    model = cobra.io.load_yaml_model(f'models/tarmodel_{name}.yml')
-    fastafile=open(f'ziyuan/{refname}_gap.fasta','w')#要保存的gapgene的fasta文件
+    model = cobra.io.load_yaml_model(f'working/{name}/{name}-GEM_withgaps.yml')
+    # if refname == 'human':
+    #     model.objective=model.reactions.MAR00021
+    #     model.reactions.MAR00021.bounds=[0,1000]
+    # gap = gapfilling.GapFiller(model, universal=refmodel, integer_threshold=1e-12, demand_reactions=False,lower_bound=0.05)
+    # for j in gap.indicators:
+    #     i=gap.model.variables.get(key=j.rxn_id)
+    #     if i._get_primal() >0:
+    #         solution.append(i.name)
+    # refmodel_reactions=[rrr.id for rrr in refmodel.reactions]
+    # for reac in model.reactions:
+    #     if reac.id not in refmodel_reactions:
+    #       refmodel.add_reactions([reac])
+    # fba=cobra.flux_analysis.pfba(refmodel)
+    model2 = cobra.io.load_yaml_model(f'working/{name}/{name}-GEM_withgaps.yml')
+    fastafile=open(f'./working/{name}/{refname}_gap.fasta','w')#要保存的gapgene的fasta文件
     targenes=[]
-    allgenes=[x for x in SeqIO.parse(open(f'ziyuan/{refname}.fasta'),'fasta')]#打开fasta文件
+    allgenes=[x for x in SeqIO.parse(open(f'data_available/{refname}.fasta'),'fasta')]#打开fasta文件
     allgenesid=[x.id.split('|')[1] for x in allgenes ]
     reacgaps=[]
-    for solution1 in solution:
-        if fba.fluxes.get(solution1)>=1e-10 or fba.fluxes.get(solution1)<=-1e-10:
-            reacgaps.append(gap.model.reactions.get_by_id(solution1))
+    # for solution1 in solution:
+    #     if fba.fluxes.get(solution1)>=1e-10 or fba.fluxes.get(solution1)<=-1e-10:
+    #         reacgaps.append(gap.model.reactions.get_by_id(solution1))
+    gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False)
+    gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
+    gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
+    gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
+    reacgaps= gapfiller.fill()[0]
     for reac in reacgaps:
         for genes in reac.genes:
             try:
               targenes.append(allgenes[allgenesid.index(findrefnames.findmodelname(genes.id))])
             except:
                 continue
-    model.add_reactions(reacgaps)
-    model.optimize()
+    if refname=='ecoli' or refname=='yeast':
+        with open(f'data_available/{refname}_full_medium.pkl', 'rb') as file:
+            fullmedium = pickle.load(file)
+        medium=refmodel.medium
+        refmodel.medium = fullmedium
+        fba2=cobra.flux_analysis.pfba(refmodel)
+        reacgaps2 = []
+        model2.medium=fullmedium
+        # for solution1 in solution:
+        #     if fba2.fluxes.get(solution1) >= 1e-10 or fba2.fluxes.get(solution1) <= -1e-10:
+        #         reacgaps2.append(gap.model.reactions.get_by_id(solution1))
+        gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False)
+        gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
+        gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
+        gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
+        reacgaps2 = gapfiller.fill()[0]
+        for reac in reacgaps2:
+            for genes in reac.genes:
+                try:
+                    targenes.append(allgenes[allgenesid.index(findrefnames.findmodelname(genes.id))])
+                except:
+                    continue
+        #pd.DataFrame(reacgaps).to_excel(f'working/{name}/reacgapsMM.xlsx')
+        #pd.DataFrame(reacgaps2).to_excel(f'working/{name}/reacgaps2FULL.xlsx')
+        reacgaps=reacgaps+reacgaps2
+    reacgaps=list(set(reacgaps))
+    model2.add_reactions(reacgaps)
+    print(model2.optimize())
     if len(targenes)!=0:
        SeqIO.write(targenes,fastafile,'fasta')
        fastafile.close()
-       os.system(f'diamond makedb --in ziyuan/{name}.fasta --db ziyuan/{name}db')
-       os.system(f'diamond blastp -q ziyuan/{refname}_gap.fasta -d ziyuan/{name}db --out ziyuan/outfile{name}.csv')
-    print([x.id for x in targenes])
-    model=read_gapgenes(model=model,genes=[x.id for x in targenes],solution=[reac.id for reac in reacgaps],refname=refname,name=name)
-    model.optimize()
+       if os.path.exists(f'working/{name}/{name}_non_anno.fasta'):
+           os.system(f'makeblastdb -in working/{name}/{name}_non_anno.fasta -dbtype nucl -input_type fasta -out working/{name}/{name}db')
+           os.system(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name} -out outfile{name}.csv -outfmt 7 -evalue 1e-3')
+       else:
+           os.system(f'diamond makedb --in working/{name}/{name}.fasta --db working/{name}/{name}db')
+           os.system(f'diamond blastp -q working/{name}/{refname}_gap.fasta -d working/{name}/{name}db --out working/{name}/outfile{name}.csv')
+    model2,nonfindgenes=read_gapgenes(model=model2,genes=[x.id for x in targenes],solution=[reac.id for reac in reacgaps],refname=refname,name=name)
+    model2.optimize()
     print([reac.id for reac in reacgaps])
-    for met in model.metabolites:
-        if met.compartment == '':
-            model.metabolites.get_by_id(met.id).compartment = 'c'
-    for re in model.reactions:
-        for cp in re.compartments:
-            if cp == '':
-                model.reactions.get_by_id(re.id).compartments.remove('')
-                model.reactions.get_by_id(re.id).compartments.add('c')
-    model.optimize()
-    cobra.io.write_sbml_model(model, f'models/tarmodel__{name}text.xml')
+       # for met in model.metabolites:
+       #     if met.compartment == '':
+       #         model.metabolites.get_by_id(met.id).compartment = 'c'
+       # for re in model.reactions:
+       #     for cp in re.compartments:
+       #         if cp == '':
+       #             model.reactions.get_by_id(re.id).compartments.remove('')
+       #             model.reactions.get_by_id(re.id).compartments.add('c')
+    if grothmedium=='min':
+        model2.medium=medium
+    filter1=model2.optimize().objective_value#changed
+    # with model2:
+    #     nonfindreactions=[r.id for r in cobra.manipulation.delete.knock_out_model_genes(model2, nonfindgenes)]
+    #     pd.DataFrame(nonfindreactions).to_excel(f'working/{name}/reacgaps_non_gene.xlsx')
+    for gene in nonfindgenes:
+        try:
+            geneid=model2.genes.get_by_id(gene)
+        except:
+            continue
+        with model2:
+            cobra.manipulation.delete.knock_out_model_genes(model2,[geneid])
+            if model2.optimize().objective_value<=0.2*filter1:#changed
+                continue
+        print('delete gene ',gene)
+        cobra.manipulation.delete.remove_genes(model2,[geneid])
+    print(model2.optimize().objective_value)
+    if refname=='ecoli':
+        cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
+    cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
 
 
 

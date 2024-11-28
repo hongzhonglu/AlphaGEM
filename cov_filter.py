@@ -14,7 +14,7 @@ import tqdm
 #from matplotlib_venn import venn2
 def result_blast(name,refname,threshold):
     # 读取DataFrame
-    yea = pd.read_excel(f"./ziyuan/{refname}.xlsx")
+    yea = pd.read_excel(f"./data_available/{refname}.xlsx")
     gene_dict = yea.set_index('Gene Names (ordered locus)')['Entry'].to_dict()
     gene_dict2 = yea.set_index('Entry')['Gene Names (ordered locus)'].to_dict()
 
@@ -24,10 +24,13 @@ def result_blast(name,refname,threshold):
     def load_fasta(file):
         seq_dict = {}
         for record in SeqIO.parse(file, "fasta"):
-            seq_dict[record.id] = record.seq
+            a=record.id
+            if "|" in a:
+                a=a.split("|")[1]
+            seq_dict[a] = record.seq
         return seq_dict
 
-    fasta1 = f"./working/{refname}.fasta"
+    fasta1 = f"./data_available/{refname}.fasta"
     fasta2 = f"./working/{name}/{name}.fasta"
 
     seq_dict1 = load_fasta(fasta1)
@@ -36,7 +39,7 @@ def result_blast(name,refname,threshold):
     # 进行BLAST比对并保存结果
     blast_results = []
 
-    for index, row in tqdm.tqdm(df.iterrows()):
+    for index, row in df.iterrows():
         gene1 = gene_dict[row[0]]
         gene2 = row[1]
 
@@ -45,20 +48,20 @@ def result_blast(name,refname,threshold):
             seq2 = seq_dict2[gene2]
 
             # 创建临时FASTA文件
-            with open("./working/temp1.fasta", "w") as f:
+            with open(f"./working/{name}/temp1.fasta", "w") as f:
                 f.write(f">{gene1}\n{seq1}\n")
-            with open("./working/temp2.fasta", "w") as f:
+            with open(f"./working/{name}/temp2.fasta", "w") as f:
                 f.write(f">{gene2}\n{seq2}\n")
 
             # 运行BLAST比对
-            blastp_cline = NcbiblastpCommandline(query="./working/temp1.fasta", subject="./working/temp2.fasta", outfmt=6, out="./working/temp_blast_results.txt")
+            blastp_cline = NcbiblastpCommandline(query=f"./working/{name}/temp1.fasta", subject=f"./working/{name}/temp2.fasta", outfmt=6, out=f"./working/{name}/temp_blast_results.txt")
             stdout, stderr = blastp_cline()
 
             # 解析BLAST结果，找出最小E-value的比对
             min_e_value = float('inf')
             best_result = None
 
-            with open("./working/temp_blast_results.txt") as result_handle:
+            with open(f"./working/{name}/temp_blast_results.txt") as result_handle:
                 for line in tqdm.tqdm(result_handle):
                     fields = line.strip().split('\t')
                     e_value = float(fields[10])
@@ -83,7 +86,7 @@ def result_blast(name,refname,threshold):
     # 保存结果到DataFrame
     result_df = pd.DataFrame(blast_results)
     query_lengths = get_gene_lens(f"{name}.fasta", in_folder=f'./working/{name}')
-    subject_lengths = get_gene_lens(f"{refname}.fasta", in_folder="./working")
+    subject_lengths = get_gene_lens(f"{refname}.fasta", in_folder="./data_available")
 
     for index, row in result_df.iterrows():
         benchlen = subject_lengths[gene_dict[row["Gene1"]]]
@@ -106,7 +109,6 @@ def result_blast(name,refname,threshold):
     # 保存图像到指定位置
     output_path = f'./working/{name}/coverage.png'
     plt.savefig(output_path, format='png', dpi=300)
-    plt.show()
     return result_df
 
 
@@ -117,7 +119,7 @@ def get_gene_lens(query, in_folder='prots'):
     out = dict()
 
     for record in records:
-        out[record.name] = len(record.seq)
+        out[record.id.split('|')[1]] = len(record.seq)
 
     return out
 
@@ -158,7 +160,7 @@ def get_gene_lens_frame(query, in_folder='prots'):
     out = []
 
     for record in records:
-        out.append({'gene': record.name, 'gene_length': len(record.seq)})
+        out.append({'gene': record.id.split('|')[1], 'gene_length': len(record.seq)})
 
     out = pd.DataFrame(out)
     return out
@@ -179,10 +181,13 @@ def get_bbh(query, subject, in_fold1,in_fold2,cov_thre):
     cols = ['gene', 'subject', 'PID', 'alnLength', 'mismatchCount', 'gapOpenCount', 'queryStart', 'queryEnd',
             'subjectStart', 'subjectEnd', 'eVal', 'bitScore']
     bbh = pd.read_csv('%s/target_bench.txt' % (in_fold1), sep='\t', names=cols)
+    bbh['gene']=bbh['gene'].apply(lambda x: x.split('|')[1])
     bbh = pd.merge(bbh, query_lengths)
     bbh['COV'] = bbh['alnLength'] / bbh['gene_length']
 
     bbh2 = pd.read_csv('%s/bench_target.txt' % (in_fold1), sep='\t', names=cols)
+    bbh2['gene']=bbh2['gene'].apply(lambda x: x.split('|')[1])
+    bbh2['subject']=bbh2['subject'].apply(lambda x: x.split('|')[1])
     bbh2 = pd.merge(bbh2, subject_lengths)
     bbh2['COV'] = bbh2['alnLength'] / bbh2['gene_length']
 
@@ -245,15 +250,15 @@ def bbh_analysis(query, subject, in_fold1,in_fold2,cov_thre):
 
 
 def bbh(name,refname,threshold,cov_thre=0.25,pid_thre=50,direction="bidirect"):
-    yea = pd.read_excel(f"./ziyuan/{refname}.xlsx")
+    yea = pd.read_excel(f"./data_available/{refname}.xlsx")
     gene_dict = yea.set_index('Gene Names (ordered locus)')['Entry'].to_dict()
     gene_dict2 = yea.set_index('Entry')['Gene Names (ordered locus)'].to_dict()
     make_blast_db(f"{name}.fasta", f"./working/{name}")
-    make_blast_db(f"{refname}.fasta", "./working")
+    #make_blast_db(f"{refname}.fasta", "./working")
     query=f"{name}.fasta"
     subject=f"{refname}.fasta"
     infold1=f"./working/{name}/"
-    infold2="./working/"
+    infold2="./data_available/"
     if os.path.exists(f'./working/{name}/bbh_parsed_{str(cov_thre)}.csv'):
         bbh_df=pd.read_csv(f'./working/{name}/bbh_parsed_{str(cov_thre)}.csv')
     else:

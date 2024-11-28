@@ -1,5 +1,5 @@
 import sys
-sys.path.append("./plmsearch/plmsearch/plmsearch_util/")
+sys.path.append('./plmsearchtools/plmsearch/plmsearch_util')
 import os
 import time
 import torch
@@ -8,8 +8,8 @@ import torch.nn as nn
 import argparse
 from tqdm import tqdm, trange
 from logzero import logger
-from model import plmsearch
-from util import get_search_list, cos_similarity, euclidean_similarity, tensor_to_list
+from plmsearchtools.plmsearch.plmsearch_util.model import plmsearch
+from plmsearchtools.plmsearch.plmsearch_util.util import get_search_list, cos_similarity, euclidean_similarity, tensor_to_list
 
 
 def plmsearch_search(query_embedding_dic, target_embedding_dic, device, model, search_dict):
@@ -91,7 +91,7 @@ def esm_similarity_search(query_embedding_dic, target_embedding_dic, device, mod
         protein_pair_dict[query_protein] = sorted(protein_pair_dict[query_protein], key=lambda x: x[1], reverse=True)
     return protein_pair_dict
 
-def ss_predictor(refname,name,threshold=0.8,save_model_path="./plmsearch/model/plmsearch.sav"):
+def ss_predictor(refname,name,threshold=0.8,save_model_path="./plmsearchtools/model/plmsearch.sav"):
     input_query_embedding = f"./working/{name}/{name}_embedding.pkl"
     input_target_embedding=f"./working/{refname}_embedding.pkl"
     with open(input_query_embedding, 'rb') as handle:
@@ -140,3 +140,101 @@ def ss_predictor(refname,name,threshold=0.8,save_model_path="./plmsearch/model/p
                         f.write(f"{protein}\t{pair[0]}\t{pair[1]}\n")
 
 
+def rhea_search(name, refname, threshold=0.8, save_model_path="./plmsearchtools/model/plmsearch.sav"):
+    input_query_embedding = f"./working/{name}/{name}_embedding.pkl"
+    if torch.cuda.is_available() == False:
+        print("GPU selected but none of them is available.")
+        device = "cpu"
+    else:
+        print("We have", torch.cuda.device_count(), "GPUs in total!, we will use as you selected")
+        device = f'cuda:{0}'
+    with open(input_query_embedding, 'rb') as handle:
+        query_embedding_dic = pickle.load(handle)
+
+    model = plmsearch(embed_dim=1280)
+    model.load_pretrained(save_model_path)
+    model.eval()
+    model_methods = model
+    if (device != "cpu"):
+        model = nn.DataParallel(model, device_ids=[0])
+        model_methods = model.module
+    model.to(device)
+
+    output_search_result = f"./working/{name}/{name}_rhea_search_filter{str(threshold)}"
+
+    with open(output_search_result, 'w') as f:
+        pass
+
+    batch_size = 50
+    query_keys_all = list(query_embedding_dic.keys())
+
+    search_dict = None
+
+    for i in range(1, 7):
+        input_target_embedding = (f"./rhea/rhea_protembedding{i}.pkl")
+        with open(input_target_embedding, 'rb') as handle:
+            target_embedding_dic = pickle.load(handle)
+
+        for i in trange(0, len(query_keys_all), batch_size, desc="Search query proteins batch by batch"):
+            batch_keys = query_keys_all[i:i + batch_size]
+            batch_query_embedding_dic = {k: query_embedding_dic[k] for k in batch_keys}
+            # get sorted pairlist
+            if (save_model_path != None):
+                search_result = plmsearch_search(batch_query_embedding_dic, target_embedding_dic, device, model_methods,
+                                                 search_dict)
+            else:
+                search_result = esm_similarity_search(batch_query_embedding_dic, target_embedding_dic, device)
+            with open(output_search_result, 'a') as f:
+                for protein in search_result:
+                    for pair in search_result[protein]:
+                        if float(pair[1]) > threshold:
+                            f.write(f"{protein}\t{pair[0]}\t{pair[1]}\n")
+    return None
+
+def ss_predictor_spe(refname,name,threshold=0.8,save_model_path="./plmsearchtools/model/plmsearch.sav"):
+    input_query_embedding = f"./working/{name}_embedding.pkl"
+    input_target_embedding=f"./working/{refname}_embedding.pkl"
+    with open(input_query_embedding, 'rb') as handle:
+        query_embedding_dic = pickle.load(handle)
+    with open(input_target_embedding, 'rb') as handle:
+        target_embedding_dic = pickle.load(handle)
+    if torch.cuda.is_available() == False:
+        print("GPU selected but none of them is available.")
+        device = "cpu"
+    else:
+        print("We have", torch.cuda.device_count(), "GPUs in total!, we will use as you selected")
+        device = f'cuda:{0}'
+
+    model = plmsearch(embed_dim=1280)
+    model.load_pretrained(save_model_path)
+    model.eval()
+    model_methods = model
+    if (device != "cpu"):
+        model = nn.DataParallel(model, device_ids=[0])
+        model_methods = model.module
+    model.to(device)
+
+    output_search_result = f"./ziyuan//{name}_ss_predictor_filter{str(threshold)}"
+
+    with open(output_search_result, 'w') as f:
+        pass
+
+    batch_size = 50
+    query_keys_all = list(query_embedding_dic.keys())
+
+    search_dict = None
+
+    for i in trange(0, len(query_keys_all), batch_size, desc="Search query proteins batch by batch"):
+        batch_keys = query_keys_all[i:i + batch_size]
+        batch_query_embedding_dic = {k: query_embedding_dic[k] for k in batch_keys}
+        # get sorted pairlist
+        if (save_model_path != None):
+            search_result = plmsearch_search(batch_query_embedding_dic, target_embedding_dic, device, model_methods,
+                                             search_dict)
+        else:
+            search_result = esm_similarity_search(batch_query_embedding_dic, target_embedding_dic, device)
+        with open(output_search_result, 'a') as f:
+            for protein in search_result:
+                for pair in search_result[protein]:
+                    if float(pair[1]) > threshold:
+                        f.write(f"{protein}\t{pair[0]}\t{pair[1]}\n")

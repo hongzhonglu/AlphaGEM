@@ -1,7 +1,7 @@
 import pandas as pd
 def predata(refname):
     global df
-    df = pd.read_excel(f'ziyuan/{refname}.xlsx')
+    df = pd.read_excel(f'data_available/{refname}.xlsx')
     global entrys
     entrys = []
     for index, row in df.iterrows():

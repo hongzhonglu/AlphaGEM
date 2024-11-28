@@ -36,10 +36,10 @@ def findtargetreaction(g, ec):
 def nonhome(name,clean_use,deepec_use,plm_use=True):
     g=Graph()
     g.parse('rhea.rdf', format='xml')
-    kegg2rhea = pd.read_csv('ziyuan/rhea2kegg_reaction.tsv', sep='\t')
+    kegg2rhea = pd.read_csv('data_available/rhea2kegg_reaction.tsv', sep='\t')
     keggdict = kegg2rhea.set_index('ID')['MASTER_ID'].to_dict()
-    egg = pd.read_excel(f'juzhen/eggec2{name}.xlsx')
-    eggec = pd.DataFrame()
+    egg = pd.read_excel(f'working/{name}/eggec2{name}.xlsx')
+    eggec = pd.DataFrame(data=None,columns=['reaction','rhea','anno'])
     for genes in range(len(egg.index)):
         if egg.iat[genes, 3] == '-':
             continue
@@ -52,15 +52,15 @@ def nonhome(name,clean_use,deepec_use,plm_use=True):
 
     resultec=eggec
     cleanec = pd.DataFrame()
-    cleanecrhea = pd.DataFrame()
+    cleanecrhea = pd.DataFrame(data=None,columns=['reaction','rhea','anno'])
     deepec = pd.DataFrame()
-    deepecrhea = pd.DataFrame()
-    plmrhea = pd.DataFrame()
+    deepecrhea = pd.DataFrame(data=None,columns=['reaction','rhea','anno'])
+    plmrhea = pd.DataFrame(data=None,columns=['reaction','rhea','anno'])
     filter_num=0.2
     if clean_use:
         filter_num=0.4
         cleanecs = pd.DataFrame()
-        clean = pd.read_csv(f'CLEAN/app/results/inputs/{name}_homoleft_maxsep.csv', sep='\t', header=None,
+        clean = pd.read_csv(f'working/{name}/{name}_homoleft_maxsep.csv', sep='\t', header=None,
                             names=['clean'])
         for i in range(len(clean.index)):
             cleanecs = pd.concat([cleanecs, pd.DataFrame(
@@ -82,7 +82,7 @@ def nonhome(name,clean_use,deepec_use,plm_use=True):
                                                   index=[1])])
     if deepec_use:
         filter_num=0.4
-        path=os.path.join(os.getcwd(),'juzhen',f'{name}_deepec_result','DeepECv2_result.txt')
+        path=os.path.join(os.getcwd(),'working',f'{name}',f'{name}_deepec_result','DeepECv2_result.txt')
         deepec=pd.read_csv(path,sep='\t')
         deepec['sequence_ID']=deepec['sequence_ID'].apply(lambda x: x.split('|')[1])
         deepec.fillna('',inplace=True)
@@ -98,8 +98,8 @@ def nonhome(name,clean_use,deepec_use,plm_use=True):
                                                   index=[1])])
     if plm_use:
         filter_num = 0.4
-        plmresult=pd.read_excel(f'juzhen/{name}_rheaid_plmsearch.xlsx')
-        plmrhea['reaction']=plmresult['Query']
+        plmresult=pd.read_excel(f'working/{name}/{name}_rheaid_plmsearch.xlsx')
+        plmrhea['reaction']=plmresult['Query'].apply(lambda x:x.split('|')[1])
         plmrhea['rhea']=plmresult['Rhea_id']
         plmrhea['anno']='plmsearch'
         plmrhea=plmrhea.drop_duplicates()
@@ -115,6 +115,6 @@ def nonhome(name,clean_use,deepec_use,plm_use=True):
     merged=pd.merge(merged, plmrhea, how='outer', on=['reaction', 'rhea'])
     merged['final_score'] = merged.apply(calculate_score, axis=1)
     resultec = merged[merged['final_score'] >= filter_num].reset_index(drop=True)
-    merged.to_excel(f'juzhen/{name}multiple_score.xlsx', index=False)
+    merged.to_excel(f'working/{name}/{name}multiple_score.xlsx', index=False)
     result = resultec.groupby('rhea')['reaction'].apply(lambda x: ' or '.join(x)).reset_index()
-    result.to_excel(f'juzhen/{name}gpr_score.xlsx')
+    result.to_excel(f'working/{name}/{name}gpr_score.xlsx')

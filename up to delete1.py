@@ -24,7 +24,7 @@ for i in range(len(gx.index)):
             3:[gx.iat[i,4]]
         })])
 gx2.columns=['names','tnames','ornot','tms']
-yea = pd.read_excel('ziyuan/yeast.xlsx')
+yea = pd.read_excel('data_available/yeast.xlsx')
 yea1 = []
 yea2 = []
 for i in range(len(yea.index)):

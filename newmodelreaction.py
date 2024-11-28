@@ -141,7 +141,7 @@ def model_reaction(name,refname):
     model = cobra.io.load_yaml_model(f'models/tarmodel{name}.yml')
     # 从文件或URL中解析RDF数据
     g.parse('rhea.rdf', format='xml')
-    kegg2rhea = pd.read_csv('ziyuan/rhea2kegg_reaction.tsv', sep='\t')
+    kegg2rhea = pd.read_csv('data_available/rhea2kegg_reaction.tsv', sep='\t')
     keggdict = kegg2rhea.set_index('RHEA_ID')['ID'].to_dict()
     model_met_exist = {}
     for met in model.metabolites:
@@ -155,7 +155,7 @@ def model_reaction(name,refname):
                     model_met_exist[met.annotation['chebi']] = met.id
         except:
             1
-    kegg2namepd = pd.read_csv('ziyuan/reaction', sep='\t', header=None, names=['id', 'name'])
+    kegg2namepd = pd.read_csv('data_available/reaction', sep='\t', header=None, names=['id', 'name'])
     kegg2name = kegg2namepd.set_index('id')['name'].to_dict()
     if refname == 'yeast':
         model_met_exist['CHEBI:15378'] = 's_0794'

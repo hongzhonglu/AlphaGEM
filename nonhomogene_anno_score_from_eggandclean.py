@@ -30,7 +30,7 @@ def findtargetreaction(g, ec):
 def nonhome(name,clean_use):
     g=Graph()
     g.parse('rhea.rdf', format='xml')
-    kegg2rhea = pd.read_csv('ziyuan/rhea2kegg_reaction.tsv', sep='\t')
+    kegg2rhea = pd.read_csv('data_available/rhea2kegg_reaction.tsv', sep='\t')
     keggdict = kegg2rhea.set_index('ID')['MASTER_ID'].to_dict()
     egg = pd.read_excel(f'juzhen/eggec2{name}.xlsx')
     eggec = pd.DataFrame()
