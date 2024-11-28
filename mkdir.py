@@ -24,4 +24,4 @@ def mvfile(name,refname,threshold,cov_threshold,id_threshold,cov_thre,pid_thre,d
     df=pd.read_excel(f"./working/{name}/{name}_ss{threshold}_cov{str(cov_threshold)}_id{str(id_threshold)}_bbh_pid{str(pid_thre)}_cov{str(cov_thre)}_{direction}.xlsx")
     df=df[["Gene1","Gene2"]]
     df.columns=[0,1]
-    df.to_excel("juzhen/juzhen_homolog.xlsx")
+    df.to_excel(f"./working/{name}/matrix_homolog{name}.xlsx")

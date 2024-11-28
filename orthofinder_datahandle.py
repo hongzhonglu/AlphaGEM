@@ -13,11 +13,12 @@ def datahandel(name='',refname=''):
         except:
             continue
 
-    shutil.copy(f'ziyuan/{refname}.fasta', f'orth/data/{name}/z-{refname}.fasta')
-    shutil.copy(f'ziyuan/{name}.fasta', f'orth/data/{name}/a-{name}.fasta')
+    shutil.copy(f'data_available/{refname}.fasta', f'orth/data/{name}/z-{refname}.fasta')
+    shutil.copy(f'working/{name}/{name}.fasta', f'orth/data/{name}/a-{name}.fasta')
     os.system(
         f'{path}/tools/OrthoFinder/orthofinder -f {path}/orth/data/{name}' )
-    pathresult=f'{path}/orth/data/{name}/'+os.listdir(f'{path}/orth/data/{name}/')[0]+'/Orthogroups/Orthogroups.tsv'
+    pathresult=f'{path}/orth/data/{name}/OrthoFinder/'+os.listdir(f'{path}/orth/data/{name}/OrthoFinder')[0]+'/Orthogroups/Orthogroups.tsv'
+
     with open(
            pathresult) as orth1:  # key is the result of orthofinder
         orth2 = orth1.read()
@@ -62,7 +63,7 @@ def datahandel(name='',refname=''):
             num += 1
         yea2 = pd.concat([yea2, yea3])
     ref = pd.read_excel(
-        f'{path}/ziyuan/{refname}.xlsx')
+        f'{path}/data_available/{refname}.xlsx')
     yea = yea2
     juzhen1 = pd.DataFrame()
     for i in range(len(tyea.index)):
@@ -83,4 +84,4 @@ def datahandel(name='',refname=''):
             except:
                 continue
     print(yea)
-    juzhen1.to_excel(f'juzhen/juzhen1{name}.xlsx')
+    juzhen1.to_excel(f'working/{name}/matrix_orthofinder{name}.xlsx')

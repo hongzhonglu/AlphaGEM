@@ -10,7 +10,7 @@ def reac_compound(file):
     1
 import pandas as pd
 import pubchempy
-cpd=pd.read_csv('ziyuan/pubchem.csv',sep='\t',header=None)
+cpd=pd.read_csv('data_available/pubchem.csv', sep='\t', header=None)
 cpd[0]=cpd[0].apply(lambda x:x[:][8:])
 cpd[1]=cpd[1].apply(lambda x:x[:][4:])
 cpd.to_excel('togivemetanetx.xlsx')

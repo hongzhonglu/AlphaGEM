@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-taryeast=pd.read_excel('ziyuan/kpastoris.xlsx')
+taryeast=pd.read_excel('data_available/kpastoris.xlsx')
 name='kpastoris'
 #os.system('chmod 660 /home/pickleopear/.wget-hsts')
 for i in range(len(taryeast.index)):

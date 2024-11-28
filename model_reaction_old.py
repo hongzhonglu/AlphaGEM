@@ -6,7 +6,7 @@ import re
 import numpy as np
 import time
 import random
-cpd=pd.read_excel('ziyuan/cpd.xlsx')
+cpd=pd.read_excel('data_available/cpd.xlsx')
 
 def find_tarname(name,strr):
     global cpd

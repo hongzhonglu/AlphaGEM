@@ -1,6 +1,6 @@
 import pandas as pd
 def nonhome(name):
-    kegg2rhea = pd.read_csv('ziyuan/rhea2kegg_reaction.tsv', sep='\t')
+    kegg2rhea = pd.read_csv('data_available/rhea2kegg_reaction.tsv', sep='\t')
     keggdict = kegg2rhea.set_index('ID')['RHEA_ID'].to_dict()
     egg = pd.read_excel(f'juzhen/eggec2{name}.xlsx')
     eggec = pd.DataFrame()

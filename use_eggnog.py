@@ -5,8 +5,8 @@ import numpy as np
 from Bio import SeqIO
 def eggnog(name,refname,i=1):
     path=os.getcwd()
-    tary = pd.read_excel(f'ziyuan/{name}.xlsx')
-    homo = pd.read_excel(f'juzhen/juzhen_homolog{name}.xlsx')
+    tary = pd.read_excel(f'working/{name}/{name}.xlsx')
+    homo = pd.read_excel(f'working/{name}/matrix_homolog{name}.xlsx')
     homo2 = []
     left = []
     for i in range(len(homo.index)):
@@ -16,19 +16,23 @@ def eggnog(name,refname,i=1):
         if tary.iat[i, 0] not in homo2:
             left.append(tary.iat[i, 0])
     left = pd.DataFrame(left)
+    try:
+        os.mkdir(f'{path}/temp/{name}')
+    except FileExistsError:
+        pass
     if i == 0:
         os.system('eggnog_mapper/download_eggnog_data.py')
         os.system('eggnog_mapper/create_dbs.py -m diamond --dbname yeast --taxa Saccharomycetes')
     if refname=='yeast':
         os.system(
-        f'{path}/eggnog_mapper/emapper.py -m diamond -i {path}/ziyuan/{name}.fasta -o test{name} --tax_scope Saccharomycetes --cpu 0 --dmnd_db {path}/eggnog_mapper/data/yeast.dmnd --override')
+        f'python {path}/eggnog_mapper/emapper.py -m diamond -i {path}/data_available/{name}.fasta -o {path}/working/{name}/test{name} --tax_scope Saccharomycetes --cpu 0 --dmnd_db {path}/eggnog_mapper/data/yeast.dmnd --temp_dir {path}/temp/{name} --override')
     if refname=='ecoli':
-        os.system(f'{path}/eggnog_mapper/emapper.py -m diamond -i {path}/ziyuan/{name}.fasta -o test{name} --tax_scope Bacteria --cpu 0 --dmnd_db {path}/eggnog_mapper/data/bacteria.dmnd --override')
+        os.system(f'python {path}/eggnog_mapper/emapper.py -m diamond -i {path}/data_available/{name}.fasta -o {path}/working/{name}/test{name} --tax_scope Bacteria --cpu 0 --dmnd_db {path}/eggnog_mapper/data/bacteria.dmnd --temp_dir {path}/temp/{name} --override')
     if refname=='strco':
-        os.system(f'{path}/eggnog_mapper/emapper.py -m diamond -i {path}/ziyuan/{name}.fasta -o test{name} --tax_scope Actinobacteria --cpu 0 --dmnd_db {path}/eggnog_mapper/data/bacteria.dmnd --override')
+        os.system(f'python {path}/eggnog_mapper/emapper.py -m diamond -i {path}/data_available/{name}.fasta -o {path}/working/{name}/test{name} --tax_scope Actinobacteria --cpu 0 --dmnd_db {path}/eggnog_mapper/data/bacteria.dmnd --temp_dir {path}/temp/{name} --override')
     if refname=='human':
-        os.system(f'{path}/eggnog_mapper/emapper.py -m diamond -i {path}/ziyuan/{name}.fasta -o test{name} --tax_scope Mammalia --cpu 0 --dmnd_db {path}/eggnog_mapper/data/mammalia.dmnd --override')
-    with open(f'test{name}.emapper.annotations') as f:
+        os.system(f'python {path}/eggnog_mapper/emapper.py -m diamond -i {path}/data_available/{name}.fasta -o {path}/working/{name}/test{name} --tax_scope Mammalia --cpu 0 --dmnd_db {path}/eggnog_mapper/data/mammalia.dmnd --temp_dir {path}/temp/{name} --override')
+    with open(f'{path}/working/{name}/test{name}.emapper.annotations') as f:
         content = f.read()
         contents = content.split('\n')
     genes = pd.DataFrame()
@@ -39,7 +43,7 @@ def eggnog(name,refname,i=1):
     genes.index = range(len(genes.index))
     for i in range(len(genes.index)):
         try:
-            genes.iat[i, 0] = genes.iat[i, 0].split('|')[2]
+            genes.iat[i, 0] = genes.iat[i, 0].split('|')[1]
         except:
             continue
     genes1 = []
@@ -58,4 +62,4 @@ def eggnog(name,refname,i=1):
         if left.iat[i, 2] != '-':
             eggnogannop = pd.concat([eggnogannop, left.iloc[[i], [0, 1, 2]]])
     eggnogannop.index = range(len(eggnogannop.index))
-    eggnogannop.to_excel(f'juzhen/eggec2{name}.xlsx')
+    eggnogannop.to_excel(f'working/{name}/eggec2{name}.xlsx')

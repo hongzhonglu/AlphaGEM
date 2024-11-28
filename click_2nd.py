@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 juzhen2=pd.DataFrame()
-taryeast=pd.read_excel('ziyuan/candida.xlsx')
+taryeast=pd.read_excel('data_available/candida.xlsx')
 juzhen1=pd.read_excel('juzhen/juzhen_homolog.xlsx')
 kkkk=[]
 for i in range(len(juzhen1.index)):

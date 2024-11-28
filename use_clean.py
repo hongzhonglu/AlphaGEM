@@ -2,14 +2,32 @@ import os
 import numpy as np
 import pandas as pd
 from Bio import SeqIO
+import shutil
+import subprocess
+
+
+def activate_clean_env():
+    try:
+        subprocess.run("source activate clean", shell=True, check=True)
+        print("Switched to CLEAN environment.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error switching to CLEAN environment: {e}")
+
+
+def activate_alphagem_env():
+    try:
+        subprocess.run("source activate AlphaGEM", shell=True, check=True)
+        print("Switched to AlphaGEM environment.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error switching to AlphaGEM environment: {e}")
 path=os.getcwd()
-ec_path=os.path.dirname(os.getcwd())+'/ECRECer-release/'
+clean_path=os.getcwd()+'/CLEAN/app'
 def get_fasta(name):
-    fasta_file=open(f'ziyuan/{name}.fasta')
+    fasta_file=open(f'working/{name}/{name}.fasta')
     fasta=SeqIO.parse(fasta_file,'fasta')
     path = os.getcwd()
-    tary = pd.read_excel(f'ziyuan/{name}.xlsx')
-    homo = pd.read_excel(f'juzhen/juzhen_homolog{name}.xlsx')
+    tary = pd.read_excel(f'working/{name}/{name}.xlsx')
+    homo = pd.read_excel(f'working/{name}/matrix_homolog{name}.xlsx')
     homo2 = []
     left = []
     records_left=[]
@@ -21,17 +39,23 @@ def get_fasta(name):
     for records in fasta:
         if records.id.split('|')[1] in left:
             records_left.append(records)
-    fasta_out=open(f'ziyuan/{name}_homoleft.fasta','w')
+    fasta_out=open(f'{clean_path}/data/inputs/{name}_homoleft.fasta','w')
     SeqIO.write(records_left,fasta_out,'fasta')
     fasta_out.close()
+    fasta_out = open(f'working/{name}/{name}_homoleft.fasta', 'w')
+    SeqIO.write(records_left, fasta_out, 'fasta')
+    fasta_out.close()
 
-def ecrecer(name):
-    if os.path.isfile(ec_path):
-        os.system(f'python {ec_path}/production.py -i ziyuan/{name}_homoleft.fasta -o {path}/juzhen/{name}_ecrecer.tsv -mode p -topk 5')
-def data_handle():
+def clean(name):
+        #activate_clean_env()
+        os.chdir(f'{clean_path}')
+        os.system(f'conda run -n clean python {clean_path}/CLEAN_infer_fasta.py --fasta_data {name}_homoleft')
+        os.chdir(f'{path}')
+        shutil.move(f'{clean_path}/results/inputs/{name}_homoleft_maxsep.csv', f'working/{name}/{name}_homoleft_maxsep.csv')
+        #activate_alphagem_env()
     
 
-def ecrecer_result(name):
+def clean_result(name):
     get_fasta(name)
-    ecrecer(name)
+    clean(name)
 

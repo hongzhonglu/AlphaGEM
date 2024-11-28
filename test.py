@@ -1,7 +1,7 @@
 import pandas as pd
 import csv
 import numpy as np
-with open('ziyuan/chem_xref.tsv', 'r') as f:
+with open('data_available/chem_xref.tsv', 'r') as f:
      reader = csv.reader(f)
      row2=[]
      che=''
@@ -17,7 +17,7 @@ for i in row2:
 
 
 
-with open('ziyuan/chem_prop.tsv','r') as f:
+with open('data_available/chem_prop.tsv', 'r') as f:
     reader=csv.reader(f)
     row3=[]
     for row in reader:
@@ -36,5 +36,5 @@ for ind,row in row31.iterrows():
     if row[4]=='':
         print(ind)
         row31=row31.drop(ind)
-row31.to_excel('ziyuan/cpd.xlsx')
+row31.to_excel('data_available/cpd.xlsx')
 row31.columns=['0','NAME','ID','FORMULA','CHARGE']

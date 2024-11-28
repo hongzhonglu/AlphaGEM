@@ -1,12 +1,12 @@
 import cobra
 import pandas as pd
 def C_source():
-    name='Kpneumoniae'
-    model = cobra.io.read_sbml_model(f'models/tarmodel__{name}text.xml')
+    name='klepo'
+    model = cobra.io.load_json_model(f'models/klepo-GEM.json')
     medium = model.medium
     medium['EX_glc__D_e'] = 0
     import pandas as pd
-    table = pd.read_excel('ziyuan/TableS2.xls')
+    table = pd.read_excel('data_available/TableS2.xls')
     medium2 = medium
     reac = []
     carbons=pd.DataFrame()
@@ -19,7 +19,7 @@ def C_source():
                 continue
         except:
             0
-        growth=pd.DataFrame({'Carbon': row['C source'], 'fba': 0, 'edata': row['data']},
+        growth=pd.DataFrame({'Carbon': row['C source'], 'fba': 'nd', 'edata': row['data']},
                      index=[0])
         try:
             try:
@@ -49,6 +49,8 @@ def C_source():
             continue
     ymodel = cobra.io.read_sbml_model('models/yeast-GEM.xml')
     for i in range(len(carbons.index)):
+        if carbons.iat[i,1]=='nd':
+            continue
         if carbons.iat[i,1]>=0.001:
             carbons.iat[i,1]='G'
         else:
@@ -65,4 +67,5 @@ def C_source():
             tn+=1
         if carbons.iat[i, 2] == 'G' and carbons.iat[i, 3] == 'E-NG':
             fp+=1
+    print(tp,tn,fn,fp)
 C_source()

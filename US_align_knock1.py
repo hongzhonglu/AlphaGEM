@@ -3,7 +3,7 @@ import os
 from plddt_find import get_plddt_from_pdb as gpl
 def read_gx(name):
     global gx
-    gx = pd.read_excel(f'juzhen/juzhen1{name}.xlsx')
+    gx = pd.read_excel(f'working/{name}/matrix_orthofinder{name}.xlsx')
 
 def tdblast(cmd1,cmd2,i,name,refname,path=''):
     pathwd=os.getcwd()
@@ -56,13 +56,13 @@ def duiying2(a,tar):
     return 0
 
 def US_align_find(name,path,refname,path2):
-    yea = pd.read_excel(f'ziyuan/{refname}.xlsx')
+    yea = pd.read_excel(f'data_available/{refname}.xlsx')
     read_gx(name)
     gx2 = pd.DataFrame()
-    tar = pd.read_excel(f'ziyuan/{name}.xlsx')
+    tar = pd.read_excel(f'working/{name}/{name}.xlsx')
     print('start usalign alignment')
     for i in range(len(gx.index)):
         gx2 = pd.concat([gx2, tdblast(duiying1(gx.iat[i, 1],yea), gx.iat[i, 2], i,name,refname,path)])
     gx2.index=range(len(gx2.index))
     print(gx2)
-    gx2.to_excel(f'juzhen/juzhen2{name}.xlsx')
+    gx2.to_excel(f'working/{name}/matrix_USalign_filtered{name}.xlsx')

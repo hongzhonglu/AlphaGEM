@@ -1,22 +1,37 @@
 import os
 import pandas as pd
 from plddt_find import get_plddt_from_pdb as gpl
+from tqdm import tqdm
 def read_gx(name):
     global gx
-    gx = pd.read_excel(f'juzhen/juzhen4{name}.xlsx')
+    gx = pd.read_excel(f'./working/{name}/matrix_foldseek_{name}.xlsx')
 gx2=pd.DataFrame()
+def plddt_datacreate(name,refname,path=''):
+    pathwd=os.getcwd()
+    if path=='':
+        path=f'{pathwd}/struct_data/taryeast/{name}'
+    tardict={}
+    for i in tqdm(os.listdir(path),'generate dict1'):
+        tardict[i.split('-')[1]]=gpl(os.path.join(path,i))
+    refdict={}
+    for i in tqdm(os.listdir(f'{pathwd}/struct_data/{refname}'),'generate dict2'):
+        refdict[i.split('-')[1]]=gpl(os.path.join(f'{pathwd}/struct_data/{refname}',i))
+    return tardict,refdict
 
-def tdblast(cmd1,cmd2,i,name,refname,path=''):
+
+
+def tdblast(cmd1, cmd2, i, name, refname, path='', tardict=None, refdict=None):
+    if tardict is None:
+        tardict = {}
     pathwd=os.getcwd()
     if path=='':
         path=f'{pathwd}/struct_data/taryeast/{name}'
     global gx2
     global gx
-    if gx.iat[i,5]<=0.7 or gx.iat[i,6]<=0.7:
+    if gx.iat[i,5]<=0.8 or gx.iat[i,6]<=0.8:
         return 0
-    d=gpl(f'{path}/AF-{cmd2}-F1-model_v4.pdb')
-    c=gpl(
-    f'{pathwd}/struct_data/{refname}/AF-{cmd1}-F1-model_v4.pdb')
+    d=tardict[cmd2]
+    c=refdict[cmd1]
     a1=gx.iat[i,1]
     b1=gx.iat[i,2]
     a2=gx.iat[i,3]
@@ -33,9 +48,10 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
         6:[c],
         7:[d]
     })])
-def foldseek_choose(name,refname,path):
+def foldseek_choose(name,refname,path=''):
     read_gx(name)
-    for i in range(len(gx.index)):
-        tdblast(gx.iat[i, 1], gx.iat[i, 2], i, name,refname, path)
+    tardict,refdict=plddt_datacreate(name,refname)
+    for i in tqdm(range(len(gx.index)),'find pLDDT'):
+        tdblast(gx.iat[i, 1], gx.iat[i, 2], i, name,refname, path,tardict,refdict)
     print(gx2)
-    gx2.to_excel(f'juzhen/juzhen4+ee{name}.xlsx')
+    gx2.to_excel(f'./working/{name}/matrix_foldseek_filtered1_{name}.xlsx')
