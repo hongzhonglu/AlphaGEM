@@ -7,25 +7,20 @@ You can install AlphaGEM through git
 You can download supplyment resources from PanBaidu:
 
   ## envrionment #
+you should create two enviroment as Deepectransformer use the old version of transformer.
 
-* 1.create environment for AlphaGEM
+* 1.create environment for AlphaGEM:
 
-      conda create -n AlphaGEM python==3.10
+      conda create -n AlphaGEM 
 
-* 2.You can install the following packages through conda for AlphaGEM:
+* 2.create enviroment for deepectransformer:
   
-      conda install diamond -c bioconda
+      conda create -n deepectransformer
   
-* 3.the following packages through pip
+* 3.prepare the source data: 
   
-      pip install biopython
-      pip install cobra
-      pip install numpy
-      pip install pandas
-  
-## use CLEAN #
+      bash ./setup.sh
 
-create enviroment for clean:
      
 
 Usage:
