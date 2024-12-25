@@ -48,7 +48,8 @@ def gapfill(name,refname,grothmedium='min'):
     #     if reac.id not in refmodel_reactions:
     #       refmodel.add_reactions([reac])
     # fba=cobra.flux_analysis.pfba(refmodel)
-    model2 = cobra.io.load_yaml_model(f'working/{name}/{name}-GEM_withgaps.yml')
+    # model2 = cobra.io.load_yaml_model(f'working/{name}/{name}-GEM_withgaps.yml')
+    model2=model.copy()
     fastafile=open(f'./working/{name}/{refname}_gap.fasta','w')#要保存的gapgene的fasta文件
     targenes=[]
     allgenes=[x for x in SeqIO.parse(open(f'data_available/{refname}.fasta'),'fasta')]#打开fasta文件
@@ -61,7 +62,18 @@ def gapfill(name,refname,grothmedium='min'):
     gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
     gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
     gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
-    reacgaps= gapfiller.fill()[0]
+    try:
+        reacgaps= gapfiller.fill()[0]
+    except:
+        reacgaps=[]
+        fba=gapfiller.model.optimize()
+        for j in gapfiller.indicators:
+            i = gapfiller.model.reactions.get_by_id(j.rxn_id)
+            if fba.fluxes[i.id] != 0:
+                try:
+                    reacgaps.append(refmodel.reactions.get_by_id(i.id))
+                except:
+                    continue
     for reac in reacgaps:
         for genes in reac.genes:
             try:
@@ -83,7 +95,18 @@ def gapfill(name,refname,grothmedium='min'):
         gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
         gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
         gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
-        reacgaps2 = gapfiller.fill()[0]
+        try:
+            reacgaps2 = gapfiller.fill()[0]
+        except:
+          reacgaps2 = []
+          fba = gapfiller.model.optimize()
+          for j in gapfiller.indicators:
+            i = gapfiller.model.reactions.get_by_id(j.rxn_id)
+            if fba.fluxes[i.id] != 0:
+                try:
+                    reacgaps2.append(refmodel.reactions.get_by_id(i.id))
+                except:
+                    continue
         for reac in reacgaps2:
             for genes in reac.genes:
                 try:
@@ -96,6 +119,7 @@ def gapfill(name,refname,grothmedium='min'):
     reacgaps=list(set(reacgaps))
     model2.add_reactions(reacgaps)
     print(model2.optimize())
+    nonfindgenes=[]
     if len(targenes)!=0:
        SeqIO.write(targenes,fastafile,'fasta')
        fastafile.close()
@@ -105,7 +129,7 @@ def gapfill(name,refname,grothmedium='min'):
        else:
            os.system(f'diamond makedb --in working/{name}/{name}.fasta --db working/{name}/{name}db')
            os.system(f'diamond blastp -q working/{name}/{refname}_gap.fasta -d working/{name}/{name}db --out working/{name}/outfile{name}.csv')
-    model2,nonfindgenes=read_gapgenes(model=model2,genes=[x.id for x in targenes],solution=[reac.id for reac in reacgaps],refname=refname,name=name)
+       model2,nonfindgenes=read_gapgenes(model=model2,genes=[x.id for x in targenes],solution=[reac.id for reac in reacgaps],refname=refname,name=name)
     model2.optimize()
     print([reac.id for reac in reacgaps])
        # for met in model.metabolites:
