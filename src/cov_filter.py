@@ -182,6 +182,7 @@ def get_bbh(query, subject, in_fold1,in_fold2,cov_thre):
             'subjectStart', 'subjectEnd', 'eVal', 'bitScore']
     bbh = pd.read_csv('%s/target_bench.txt' % (in_fold1), sep='\t', names=cols)
     bbh['gene']=bbh['gene'].apply(lambda x: x.split('|')[1])
+    bbh['subject'] = bbh['subject'].apply(lambda x: x.split('|')[1])
     bbh = pd.merge(bbh, query_lengths)
     bbh['COV'] = bbh['alnLength'] / bbh['gene_length']
 
