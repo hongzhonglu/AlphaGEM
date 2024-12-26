@@ -26,4 +26,4 @@ you should create two enviroment as Deepectransformer use the old version of tra
 Usage:
 ======
 ## Basic Use #
-     main.py --name species_name --refname reference_species_name --fasta fasta_file --cleanuse True
+     python AlphaGEM.py --name species_name --refname reference_species_name --fasta fasta_file --cleanuse True
