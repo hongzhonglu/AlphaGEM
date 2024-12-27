@@ -125,8 +125,8 @@ def gapfill(name,refname,grothmedium='min'):
        fastafile.close()
        if os.path.exists(f'working/{name}/{name}_non_anno.fasta'):
            os.system(f'makeblastdb -in working/{name}/{name}_non_anno.fasta -dbtype nucl -input_type fasta -out working/{name}/{name}db')
-           print(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out outfile{name}.csv -outfmt 7 -evalue 1e-3')
-           os.system(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out /working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-3')
+           print(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-3')
+           os.system(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-3')
        else:
            os.system(f'diamond makedb --in working/{name}/{name}.fasta --db working/{name}/{name}db')
            os.system(f'diamond blastp -q working/{name}/{refname}_gap.fasta -d working/{name}/{name}db --out working/{name}/outfile{name}.csv')
