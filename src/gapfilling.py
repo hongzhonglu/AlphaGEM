@@ -80,6 +80,7 @@ def gapfill(name,refname,grothmedium='min'):
               targenes.append(allgenes[allgenesid.index(findrefnames.findmodelname(genes.id))])
             except:
                 continue
+    medium = refmodel.medium
     if refname=='ecoli' or refname=='yeast':
         with open(f'data_available/{refname}_full_medium.pkl', 'rb') as file:
             fullmedium = pickle.load(file)
