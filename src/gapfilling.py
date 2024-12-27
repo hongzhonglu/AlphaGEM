@@ -155,7 +155,10 @@ def gapfill(name,refname,grothmedium='min'):
             continue
         with model2:
             cobra.manipulation.delete.knock_out_model_genes(model2,[geneid])
-            if model2.optimize().objective_value<=0.2*filter1:#changed
+            try:
+              if model2.optimize().objective_value<=0.2*filter1:#changed
+                continue
+            except:
                 continue
         print('delete gene ',gene)
         cobra.manipulation.delete.remove_genes(model2,[geneid])
