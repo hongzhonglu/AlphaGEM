@@ -116,7 +116,7 @@ def gapfill(name,refname,grothmedium='min'):
         #pd.DataFrame(reacgaps).to_excel(f'working/{name}/reacgapsMM.xlsx')
         #pd.DataFrame(reacgaps2).to_excel(f'working/{name}/reacgaps2FULL.xlsx')
         reacgaps=reacgaps+reacgaps2
-    reacgaps=list(set(reacgaps))
+    reacgaps=[refmodel.reactions.get_by_id(r) for r in list(set([r.id for r in reacgaps]))]
     model2.add_reactions(reacgaps)
     print(model2.optimize())
     nonfindgenes=[]
@@ -125,7 +125,8 @@ def gapfill(name,refname,grothmedium='min'):
        fastafile.close()
        if os.path.exists(f'working/{name}/{name}_non_anno.fasta'):
            os.system(f'makeblastdb -in working/{name}/{name}_non_anno.fasta -dbtype nucl -input_type fasta -out working/{name}/{name}db')
-           os.system(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name} -out outfile{name}.csv -outfmt 7 -evalue 1e-3')
+           print(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out outfile{name}.csv -outfmt 7 -evalue 1e-3')
+           os.system(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out /working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-3')
        else:
            os.system(f'diamond makedb --in working/{name}/{name}.fasta --db working/{name}/{name}db')
            os.system(f'diamond blastp -q working/{name}/{refname}_gap.fasta -d working/{name}/{name}db --out working/{name}/outfile{name}.csv')
