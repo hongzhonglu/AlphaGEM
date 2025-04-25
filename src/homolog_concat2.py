@@ -20,4 +20,4 @@ def homo(name):
             1: [gx4.iat[i, 2]]
         })])
     gx3.index = range(len(gx3.index))
-    gx3.to_excel(f'working/{name}/matrix_homolog{name}.xlsx')
+    gx3.to_excel(f'working/{name}/matrix_homolog{name}_preforprottrans.xlsx')

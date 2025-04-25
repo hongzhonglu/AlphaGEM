@@ -9,7 +9,7 @@ def foldseek_choose(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,cov
     gx2 = pd.DataFrame()
     for i in range(len(gx.index)):
         if model_transpoter_found.transpoter(gx.iat[i, 1]) == 1:
-            if gx.iat[i, 5] > TMscoretrans and gx.iat[i, 6] > TMscoretrans and gx.iat[i, 7] > pLDDt and gx.iat[i, 8] > pLDDt and gx.iat[i, 4] >= coveragetrans:
+            if gx.iat[i, 5] > TMscoretrans and gx.iat[i, 6] > TMscoretrans and gx.iat[i, 7] > pLDDt and gx.iat[i, 8] > pLDDt and gx.iat[i, 4] >= coveragetrans and align2.align(gx.iat[i, 1],gx.iat[i, 2])>0.3:
                 gx2 = pd.concat([gx2, pd.DataFrame({
                     'gene1': [gx.iat[i, 1]],
                     'gene2': [gx.iat[i, 2]],

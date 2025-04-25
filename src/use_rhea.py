@@ -10,6 +10,8 @@ from ss_predict_choose import ss_predict_choose_rhea
 def process_rhea(name,refname,threshold,left):
     header=["ID","Query"]
     rhea_homo=pd.read_excel(f"./working/{name}/{name}_rhea_homolog{str(threshold)}.xlsx",index_col=0,header=None,names=header)
+    rhea_homo.reset_index(drop=True,inplace=True)
+    rhea_homo=rhea_homo.drop(0)
     if rhea_homo.empty:
         print("No rhea homologs found")
         rhea_homo=pd.DataFrame({"ID":[],"Query":[]})
