@@ -1,6 +1,25 @@
 import pandas as pd
 import os
 from plddt_find import get_plddt_from_pdb as gpl
+from functools import partial
+import multiprocessing
+from tqdm import tqdm
+import subprocess
+
+
+def worker(i, gx, yeadict, name, refname, path):
+    return tdblast(duiying1(gx.iat[i, 1], yeadict), gx.iat[i, 2], i, name, refname, path)
+
+
+def parallel_processing(gx, yeadict, name, refname, path):
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    worker_with_args = partial(worker, gx=gx, yeadict=yeadict, name=name, refname=refname, path=path)
+    results = list(tqdm(pool.imap(worker_with_args, range(len(gx.index))), total=len(gx.index)))
+    pool.close()
+    pool.join()
+
+    return results
+
 def read_gx(name):
     global gx
     gx = pd.read_excel(f'working/{name}/matrix_orthofinder{name}.xlsx')
@@ -14,24 +33,16 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
     pdd=pd.DataFrame({1:[0],2:[0],3:[0],4:[0],5:[0],6:[0]})
     if cmd1==0 or cmd2==0:
         return pdd
-    res = os.popen(f"{pathwd}/tools/USalign/USalign {path}/AF-{cmd2}-F1-model_v4.pdb {pathwd}/struct_data/{refname}/AF-{cmd1}-F1-model_v4.pdb")
-    for j in range(20):
-        r = res.readline()
-        print(r)
-        try:
-           if j==10:
-               a=eval(r[23:26])
-           if j==11:
-               b=eval(r[23:26])
-           if j==13:
-               c=eval(r[16:19])
-           if j == 14:
-               d=r[10:16]
-           if j == 15:
-               e=r[10:16]
-        except:
-            d=''
-            e=''
+    cmd = f"{pathwd}/tools/USalign/USalign {path}/AF-{cmd2}-F1-model_v4.pdb {pathwd}/struct_data/{refname}/AF-{cmd1}-F1-model_v4.pdb"
+    res = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output = res.stdout.readlines()
+    try:
+        d = float(output[15][10:17])
+        e = float(output[16][10:17])
+    except Exception as ex:
+        print(f"Error occurred: {ex}")
+        d = e = ''
+    print('done', cmd1, cmd2)
     if d!='':
             f=gpl(
             f'{path}/AF-{cmd2}-F1-model_v4.pdb')
@@ -45,10 +56,10 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
     return pdd
 
 def duiying1(a,yea):
-    for i in range(len(yea.index)):
-        if a==yea.iat[i,2]:
-            return yea.iat[i,0]
-    return a
+    try:
+        return yea[a]
+    except:
+        return a
 def duiying2(a,tar):
     for i in range(len(tar.index)):
         if a==tar.iat[i,1]:
@@ -57,12 +68,14 @@ def duiying2(a,tar):
 
 def US_align_find(name,path,refname,path2):
     yea = pd.read_excel(f'data_available/{refname}.xlsx')
+    yeadict={yea.iat[i,2]:yea.iat[i,0] for i in range(len(yea.index))}
     read_gx(name)
     gx2 = pd.DataFrame()
     tar = pd.read_excel(f'working/{name}/{name}.xlsx')
+    results=[]
     print('start usalign alignment')
-    for i in range(len(gx.index)):
-        gx2 = pd.concat([gx2, tdblast(duiying1(gx.iat[i, 1],yea), gx.iat[i, 2], i,name,refname,path)])
+    results = parallel_processing(gx, yeadict, name, refname, path)
+    gx2=pd.concat(results)
     gx2.index=range(len(gx2.index))
     print(gx2)
     gx2.to_excel(f'working/{name}/matrix_USalign_filtered{name}.xlsx')

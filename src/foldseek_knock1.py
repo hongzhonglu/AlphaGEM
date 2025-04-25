@@ -23,6 +23,7 @@ def foldseekfind(path_taryeast_structure='',name='',refname=''):
         os.system(
             f'foldseek easy-search {pathwd}/struct_data/{refname} {pathwd}/struct_data/taryeast/{name}db/{name}db {pathwd}/working/{name}/aln{name}.csv tmpFolder --format-output "query,target,alntmscore,prob,qcov,tcov" --alignment-type 2 -e 0.00001')
         aln = pd.read_csv(f'{pathwd}/working/{name}/aln{name}.csv',sep='\t',names=['ref','tar','tms','pro','rcov','tcov'])
+        # aln2 = aln[aln['pro'] >= 1]
         aln2 = aln[aln['pro'] >= 1]
         aln2['ref']=aln2['ref'].apply(lambda x:x[3:x.rfind('-F1-')])
         aln2['tar']=aln2['tar'].apply(lambda x: x[3:x.rfind('-F1-')])

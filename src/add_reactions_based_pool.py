@@ -54,6 +54,7 @@ def model_reaction(name,refname):
     Reactions=[]
     reactionpools=reactionpool.copy()
     # reactionpools=reactionpoolcomp('c','e',reactionpools)
+    metdict={metss.name.lower():metss for metss in model.metabolites if metss.compartment=='c'}
     for index, row in tqdm(gpr_e.iterrows()):
         reactions=[]
         reactions.append(str(row['rhea']))
@@ -76,6 +77,17 @@ def model_reaction(name,refname):
             reaction_add.annotation['from']='nonhomo'
             if reaction_add.id in refids:
                 reaction_add=refmodel.reactions.get_by_id(reaction_add.id)
+            for met in reaction_add.metabolites.keys():
+                 try:
+                     print(f'{met.name.lower()} is added to {reaction_add.name}')
+                     if metdict[met.name.lower()].formula==met.formula and metdict[met.name.lower()].charge==met.charge and metdict[met.name.lower()].compartment==met.compartment:
+                         reaction_add.add_metabolites({metdict[met.name.lower()]:reaction_add.metabolites[met],
+                                                       met:-1*reaction_add.metabolites[met]})
+                         print(f'{met.name.lower()} is added to {reaction_add.name}')
+                         print(reaction_add.metabolites)
+                 except KeyError as e:
+                     print(e)
+                     pass
             try:
                 if check_reactions(reaction_add, model)!=0:
                     model.add_reactions([reaction_add])

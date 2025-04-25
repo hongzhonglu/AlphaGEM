@@ -18,7 +18,7 @@ def datahandel(name='',refname=''):
     shutil.copy(f'data_available/{refname}.fasta', f'orth/data/{name}/z-{refname}.fasta')
     shutil.copy(f'working/{name}/{name}.fasta', f'orth/data/{name}/a-{name}.fasta')
     os.system(
-        f'python {path}/tools/OrthoFinder/orthofinder.py -f {path}/orth/data/{name}' )
+        f'python {path}/tools/OrthoFinder/orthofinder.py -f {path}/orth/data/{name} -og' )
     pathresult=f'{path}/orth/data/{name}/OrthoFinder/'+os.listdir(f'{path}/orth/data/{name}/OrthoFinder')[0]+'/Orthogroups/Orthogroups.tsv'
 
     with open(
@@ -32,7 +32,7 @@ def datahandel(name='',refname=''):
     orth = orth.fillna('none')
     orth.astype(str)
     for i in range(len(orth.index)):
-        tyea2 = pd.DataFrame(np.zeros([1, 200]))
+        tyea2 = pd.DataFrame(np.zeros([1, 2000]))
         num = 0
         num2 = 0
         l = 0
@@ -49,7 +49,7 @@ def datahandel(name='',refname=''):
         tyea = pd.concat([tyea, tyea2])
     yea2 = pd.DataFrame()
     for i in range(len(orth.index)):
-        yea3 = pd.DataFrame(np.zeros([1, 200]))
+        yea3 = pd.DataFrame(np.zeros([1, 2000]))
         num = 0
         num2 = 0
         l = 0

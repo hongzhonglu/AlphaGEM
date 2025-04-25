@@ -1,6 +1,7 @@
 import cobra
 import pandas as pd
 from tqdm import tqdm
+import gc
 def str_chanege_for_gpr(old_gpr,oldgene,newgenes):
     new_gpr=''
     oldgprcell=old_gpr.split(' or ')
@@ -24,15 +25,16 @@ def str_chanege_for_gpr(old_gpr,oldgene,newgenes):
 def get_complex(leftreactions,homodict):
     complexdict={}
     for reaction in tqdm(leftreactions,'preparing other reactions'):
+        gprori=reaction.gene_reaction_rule
         for gene in list(reaction.genes):
             try:
-                reaction.gene_reaction_rule=str_chanege_for_gpr(reaction.gene_reaction_rule,gene.id,homodict[gene.id])
+                gprori=str_chanege_for_gpr(gprori,gene.id,homodict[gene.id])
             except:
-                reaction.gene_reaction_rule=str_chanege_for_gpr(reaction.gene_reaction_rule,gene.id,['None'])
-        complexdict[reaction.id]=[gpr.replace('(','').replace(')','') for gpr in reaction.gene_reaction_rule.split(' or ')]
+                gprori=str_chanege_for_gpr(gprori,gene.id,['None'])
+        complexdict[reaction.id]=[gpr.replace('(','').replace(')','') for gpr in gprori.split(' or ')]
     return complexdict
 
-def modelbuild(refmodel,name):
+def modelbuild(refmodel,name,mincomp=0.8):
     tarname = name
     tarmod = cobra.io.load_yaml_model(f'working/{name}/model1{name}.yml')
     print('imported target model')
@@ -53,27 +55,33 @@ def modelbuild(refmodel,name):
     homos.columns = ['number', 'refmodelgene', 'tarmodelgene']
     homodict={}
     for groups in homos.groupby('refmodelgene'):
-        homodict[groups[0]]=list(groups[1]['tarmodelgene'])
+        try:
+            homodict[groups[0]]=list(groups[1]['tarmodelgene'])#changed
+        except KeyError:
+            homodict[groups[0]] = list(groups[1]['tarmodelgene'])
     #add othergenes
     for i in tqdm(range(len(tarmod.reactions))):
         tarmodel.add_reactions([tarmod.reactions[i]])
-
+    del tarmod
     complexdict=get_complex(leftreactions,homodict)
     complextruedict={}
     for key,gpr in tqdm(complexdict.items(),'adding complex'):
         complextruedict[key]=[]
         for gprs in gpr:
-            if gprs.split(' and ').count('None')<=0.2*len(gprs.split(' and ')):
+            if gprs.split(' and ').count('None')<=(1-mincomp)*len(gprs.split(' and ')):
                 complextruedict[key].append('('+' and '.join([x for x in gprs.split(' and ') if x != 'None'])+')')
         if complextruedict[key]==[]:
             complextruedict.pop(key)
+    del gpr,key,complexdict
     toaddreactions=[]
+    gc.collect()
     for key in tqdm(complextruedict.keys(),'changing gpr'):
+        rxn1=ymod.reactions.get_by_id(key)
         if len(complextruedict[key])>1:
-            ymod.reactions.get_by_id(key).gene_reaction_rule=' or '.join(complextruedict[key])
+            rxn1.gene_reaction_rule=' or '.join(complextruedict[key])
         else:
-            ymod.reactions.get_by_id(key).gene_reaction_rule=complextruedict[key][0][1:-1]
-        toaddreactions.append(ymod.reactions.get_by_id(key))
+            rxn1.gene_reaction_rule=complextruedict[key][0][1:-1]
+        toaddreactions.append(rxn1)
     print(f'added complexes {len(toaddreactions)}')
     tarmodel.add_reactions(toaddreactions)
     tarmodel.objective=ymod.objective

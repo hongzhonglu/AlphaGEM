@@ -7,13 +7,13 @@ import os
 def calculate_score(row):
     score=0
     if pd.notnull(row['anno_B']):
-        score+=0.2
+        score+=0.3
     if pd.notnull(row['anno_A']):
         score+=0.2
     if pd.notnull(row['anno_C']):
         score+=0.2
     if pd.notnull(row['anno_D']):
-        score+=0.2
+        score+=0.1
     return score
 
 
@@ -33,7 +33,7 @@ def findtargetreaction(g, ec):
     rhea=[str(row.x).split("/")[-1] for row in reactions]
     return rhea
 
-def nonhome(name,clean_use,deepec_use,plm_use=True):
+def nonhome(name,clean_use,deepec_use,plm_use=True,ecgraph=False):
     g=Graph()
     g.parse('rhea/rhea.rdf', format='xml')
     kegg2rhea = pd.read_csv('data_available/rhea2kegg_reaction.tsv', sep='\t')
@@ -56,7 +56,7 @@ def nonhome(name,clean_use,deepec_use,plm_use=True):
     deepec = pd.DataFrame()
     deepecrhea = pd.DataFrame(data=None,columns=['reaction','rhea','anno'])
     plmrhea = pd.DataFrame(data=None,columns=['reaction','rhea','anno'])
-    filter_num=0.2
+    filter_num=0.1
     if clean_use:
         filter_num=0.4
         cleanecs = pd.DataFrame()
@@ -106,6 +106,9 @@ def nonhome(name,clean_use,deepec_use,plm_use=True):
         plmrhea['rhea']=plmrhea['rhea'].apply(lambda x:str(x))
         #for genes in range(len(plmresult.index)):
             #plmrhea = pd.concat([plmrhea,pd.DataFrame({'reaction':plmresult.iat[genes, 1], 'rhea':plmresult.iat[genes,2] ,'anno':'plm'},index=[1])])
+    if ecgraph:
+        filter_num=0.5
+        ecgraphresult=pd.read_excel(f'working/{name}/{name}_ecgraphsearch.xlsx')
     merged = pd.merge(cleanecrhea, eggec, how='outer', on=['reaction', 'rhea'], suffixes=('_A', '_B'))
     deepecrhea = deepecrhea.add_suffix('_C')
     deepecrhea.rename(columns={'reaction_C': 'reaction', 'rhea_C': 'rhea'}, inplace=True)

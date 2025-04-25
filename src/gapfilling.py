@@ -35,9 +35,15 @@ def gapfill(name,refname,grothmedium='min'):
         refmodel = cobra.io.read_sbml_model('models/Human-GEM.xml')
     findrefnames.predata(refname)
     model = cobra.io.load_yaml_model(f'working/{name}/{name}-GEM_withgaps.yml')
-    # if refname == 'human':
-    #     model.objective=model.reactions.MAR00021
-    #     model.reactions.MAR00021.bounds=[0,1000]
+    if refname == 'human':
+        model.objective=model.reactions.MAR00021
+        model.reactions.MAR00021.bounds=[0,1000]
+    try:
+      if model.optimize().objective_value>0.001:
+        cobra.io.write_sbml_model(model, f'./working/{name}/{name}-GEM.xml')
+        return 0
+    except:
+        pass
     # gap = gapfilling.GapFiller(model, universal=refmodel, integer_threshold=1e-12, demand_reactions=False,lower_bound=0.05)
     # for j in gap.indicators:
     #     i=gap.model.variables.get(key=j.rxn_id)
@@ -81,7 +87,7 @@ def gapfill(name,refname,grothmedium='min'):
             except:
                 continue
     medium = refmodel.medium
-    if refname=='ecoli' or refname=='yeast':
+    if refname!='human' and refname!='strco':
         with open(f'data_available/{refname}_full_medium.pkl', 'rb') as file:
             fullmedium = pickle.load(file)
         medium=refmodel.medium
@@ -108,6 +114,8 @@ def gapfill(name,refname,grothmedium='min'):
                     reacgaps2.append(refmodel.reactions.get_by_id(i.id))
                 except:
                     continue
+        if refname=='yeast':
+           reacgaps2.append(refmodel.reactions.get_by_id('rhea_21624_c'))
         for reac in reacgaps2:
             for genes in reac.genes:
                 try:
@@ -120,6 +128,22 @@ def gapfill(name,refname,grothmedium='min'):
     reacgaps=[refmodel.reactions.get_by_id(r) for r in list(set([r.id for r in reacgaps]))]
     model2.add_reactions(reacgaps)
     print(model2.optimize())
+    if model2.optimize().objective_value<=1e-5:
+        gapnow=[]
+        for j in gapfiller.indicators:
+            i = gapfiller.model.reactions.get_by_id(j.rxn_id)
+            with model2:
+                model2.add_reactions([i])
+                if model2.optimize().objective_value>1e-4:
+                    gapnow.append(i)
+        print(gapnow)
+        for reac in gapnow:
+            for genes in reac.genes:
+                try:
+                    targenes.append(allgenes[allgenesid.index(findrefnames.findmodelname(genes.id))])
+                except:
+                    continue
+        model2.add_reactions(gapnow)
     nonfindgenes=[]
     if len(targenes)!=0:
        SeqIO.write(targenes,fastafile,'fasta')

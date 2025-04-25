@@ -38,7 +38,6 @@ def cluster(spe,clusteresp=0.6,uptm=0.90,upcov=0.90):
            if row['tmscore']>=uptm and row['coverage']>=upcov:
               result.append(row)
        del values, values_scaled, group, non_noise_clusters, highest_elements
-       gc.collect()
        # #使用KMeans聚类
        # if len(group.index) >=3:
        #     kmeans = KMeans(n_clusters=2)  # 可以根据需要调整聚类数量

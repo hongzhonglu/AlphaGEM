@@ -6,7 +6,7 @@ def US_align_choose(name):
     gx2.fillna(value=1, inplace=True)
     a = 0
     for i in range(len(gx2.index)):
-        if gx2.iat[i, 3] + gx2.iat[i, 4] >= 1.4 or gx2.iat[i, 5] + gx2.iat[i, 6] <= 1.6:
+        if (gx2.iat[i, 3] + gx2.iat[i, 4] >= 1.4) or (gx2.iat[i, 5] + gx2.iat[i, 6] <= 1.6):
             gx3 = pd.concat([gx3, pd.DataFrame({0: [gx2.iat[i, 1]],
                                                 1: [gx2.iat[i, 2]],
                                                 2: [gx2.iat[i, 3]],
