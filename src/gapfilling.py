@@ -11,6 +11,8 @@ import pickle
 def read_gapgenes(model,genes,solution,refname,name):
     findrefnames.predata(refname)
     df=pd.read_csv(f'working/{name}/outfile{name}.csv',sep='\t',names=range(12))
+    df = df[df.iloc[:, 11] >= 200]
+    df = df.sort_values(by=df.columns[11], ascending=False)
     nonfindgenes=[]
     for gene in genes:
         try:
@@ -64,7 +66,8 @@ def gapfill(name,refname,grothmedium='min'):
     # for solution1 in solution:
     #     if fba.fluxes.get(solution1)>=1e-10 or fba.fluxes.get(solution1)<=-1e-10:
     #         reacgaps.append(gap.model.reactions.get_by_id(solution1))
-    gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False)
+    objectbound=refmodel.optimize().objective_value
+    gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=objectbound*0.5)
     gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
     gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
     gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
@@ -92,13 +95,14 @@ def gapfill(name,refname,grothmedium='min'):
             fullmedium = pickle.load(file)
         medium=refmodel.medium
         refmodel.medium = fullmedium
+        objectbound = refmodel.optimize().objective_value
         fba2=cobra.flux_analysis.pfba(refmodel)
         reacgaps2 = []
         model2.medium=fullmedium
         # for solution1 in solution:
         #     if fba2.fluxes.get(solution1) >= 1e-10 or fba2.fluxes.get(solution1) <= -1e-10:
         #         reacgaps2.append(gap.model.reactions.get_by_id(solution1))
-        gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False)
+        gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=objectbound*0.5)
         gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
         gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
         gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
@@ -150,8 +154,8 @@ def gapfill(name,refname,grothmedium='min'):
        fastafile.close()
        if os.path.exists(f'working/{name}/{name}_non_anno.fasta'):
            os.system(f'makeblastdb -in working/{name}/{name}_non_anno.fasta -dbtype nucl -input_type fasta -out working/{name}/{name}db')
-           print(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-3')
-           os.system(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-3')
+           print(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-1 -sorthits 1')
+           os.system(f'tblastn -query working/{name}/{refname}_gap.fasta -db working/{name}/{name}db -out working/{name}/outfile{name}.csv -outfmt 7 -evalue 1e-1 -sorthits 1')
        else:
            os.system(f'diamond makedb --in working/{name}/{name}.fasta --db working/{name}/{name}db')
            os.system(f'diamond blastp -q working/{name}/{refname}_gap.fasta -d working/{name}/{name}db --out working/{name}/outfile{name}.csv')
@@ -180,7 +184,7 @@ def gapfill(name,refname,grothmedium='min'):
         with model2:
             cobra.manipulation.delete.knock_out_model_genes(model2,[geneid])
             try:
-              if model2.optimize().objective_value<=0.2*filter1:#changed
+              if model2.optimize().objective_value<=0.5*filter1:#changed
                 continue
             except:
                 continue

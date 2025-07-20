@@ -79,8 +79,19 @@ def model_reaction(name,refname):
                 reaction_add=refmodel.reactions.get_by_id(reaction_add.id)
             for met in reaction_add.metabolites.keys():
                  try:
-                     print(f'{met.name.lower()} is added to {reaction_add.name}')
-                     if metdict[met.name.lower()].formula==met.formula and metdict[met.name.lower()].charge==met.charge and metdict[met.name.lower()].compartment==met.compartment:
+                     try:
+                       if (metdict[met.name.lower()].elements['H'] - met.elements['H'] == metdict[
+                         met.name.lower()].charge - met.charge and metdict[met.name.lower()].elements.pop(
+                         'H') == met.elements.pop('H')) and metdict[met.name.lower()].compartment==met.compartment:
+                         reaction_add.add_metabolites({metdict[met.name.lower()]: reaction_add.metabolites[met],
+                                                       met: -1 * reaction_add.metabolites[met]})
+                         print(f'{met.name.lower()} is added to {reaction_add.name}')
+                         print(reaction_add.metabolites)
+                     except:
+                       pass
+
+                     if ((metdict[met.name.lower()].elements==met.elements and metdict[
+                         met.name.lower()].charge==met.charge)) and metdict[met.name.lower()].compartment==met.compartment:
                          reaction_add.add_metabolites({metdict[met.name.lower()]:reaction_add.metabolites[met],
                                                        met:-1*reaction_add.metabolites[met]})
                          print(f'{met.name.lower()} is added to {reaction_add.name}')

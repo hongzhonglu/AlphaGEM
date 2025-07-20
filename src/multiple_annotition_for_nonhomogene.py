@@ -109,6 +109,7 @@ def nonhome(name,clean_use,deepec_use,plm_use=True,ecgraph=False):
     if ecgraph:
         filter_num=0.5
         ecgraphresult=pd.read_excel(f'working/{name}/{name}_ecgraphsearch.xlsx')
+    filter_num=filter_num-0.02
     merged = pd.merge(cleanecrhea, eggec, how='outer', on=['reaction', 'rhea'], suffixes=('_A', '_B'))
     deepecrhea = deepecrhea.add_suffix('_C')
     deepecrhea.rename(columns={'reaction_C': 'reaction', 'rhea_C': 'rhea'}, inplace=True)
