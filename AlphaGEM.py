@@ -21,6 +21,7 @@ import foldseek_choose
 import foldseek_choose2
 import foldseekcluster
 import homolog_concat2
+import filter_by_prottrans
 import model_build1
 import model_build2
 import use_clean
@@ -45,7 +46,7 @@ def main():
     parser.add_argument('--refname', type=str, help='reference name')
     parser.add_argument('--name', type=str, help='target GEMs name')
     parser.add_argument('--fasta', type=str, help='your target species genome')
-    parser.add_argument('--list', type=str,default='', help='lists of structures and genenames')
+    parser.add_argument('--maplist', type=str,default='', help='mapping list of structures and genes names')
     parser.add_argument('--structure', type=str,default='', help='files you store structures')
     parser.add_argument('--cleanuse', type=bool, help='whether you have used CLEAN')
     parser.add_argument('--TMscore', type=float,default=0.7,help='filter TMscore')
@@ -63,7 +64,7 @@ def main():
     refname=args.refname
     refmodel=''
     name=args.name
-    listfile=args.list
+    listfile=args.maplist
     structurefile=args.structure
     TMscore = args.TMscore
     TMscoretrans=args.TMscoretrans
@@ -88,7 +89,8 @@ def main():
     except FileExistsError:
         pass
     fasta_handle.handle(fasta,name)
-    #plmsearch_embedding.embedding_generate(name)
+    if not os.path.isfile(f'./working/{name}/{name}_embedding.pkl'):
+        plmsearch_embedding.embedding_generate(name)
     if mode=='structure alignment':
         # generate_list.generare_list_with_structure(name,listfile,structurefile)
         # orthofinder_datahandle.datahandel(name,refname)
@@ -98,16 +100,18 @@ def main():
         # foldseek_choose.foldseek_choose(name, refname, path_taryeast_structure)
         # foldseek_choose2.foldseek_choose2(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDT)
         # foldseekcluster.cluster(name,spe,uptm=upTMscore,upcov=upcoverage)
-        homolog_concat2.homo(name)
+        # homolog_concat2.homo(name)
+        # filter_by_prottrans.filter_by_prottrans(name,refname)
+        a=1
     if mode=='plmsearch':
-        threshold = 0.8
-        cov_thre = 0.25
-        cov_threshold = 0.5
-        pid_thre = 60
-        id_threshold = 20
+        threshold = 0.95
+        cov_thre = 0.8#双向blast阈值
+        cov_threshold = 0.9#plmsearch阈值
+        pid_thre = 70#双向blast阈值
+        id_threshold = 70#plmsearch阈值
         direction = "direct"
         generate_list.generare_list_without_structure(name)
-        plmsearch.ss_predictor(refname, name)
+        plmsearch.ss_predictor(refname, name,threshold)
         ss_predict_choose.ss_predict_choose(name, refname, threshold)
         cov_filter.result_blast(name, refname, threshold)
         cov_filter.cov_filter(name, refname, threshold, cov_threshold, id_threshold)
@@ -119,8 +123,8 @@ def main():
     # use_eggnog.eggnog(name,refname, 1)
     # use_clean.clean_result(name)
     # use_deepectransformer.use_deepectransformer(name)
-    use_rhea.rhea(name,refname)
-    multiple_annotition_for_nonhomogene.nonhome(name,cleanuse,True)
+    # use_rhea.rhea(name,refname)
+    # multiple_annotition_for_nonhomogene.nonhome(name,True,True)
     add_reactions_based_pool.model_reaction(name,refname)
     gapfilling.gapfill(name, refname,grothmedium)
 
@@ -128,5 +132,5 @@ def main():
 if __name__=='__main__':
     main()
 t2=time.time()
-print(t2-t1)
-print('s')
+print('AlphaGEM costs ',str(t2-t1),' seconds')
+

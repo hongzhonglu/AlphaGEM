@@ -1,0 +1,5 @@
+mouse:
+python AlphaGEM.py --name mouse --refname human --fasta working/mouse/mouse.fasta --cleanuse True --TMscore 0.85 --TMscoretrans 0.85 --coverage 0.9 --coveragetrans 0.9 --upTMscore 0.95 --upcoverage 0.98 --esp 0.9
+打分参数：3221
+酵母：全默认，打分参数：3231
+klepo：全默认，打分参数：3221

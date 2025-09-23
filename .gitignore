@@ -1,0 +1,18 @@
+# 常见临时/中间结果
+tmpFolder/*
+temp/*
+working/*
+calculate/
+src/_pycache_
+# 明显超大数据目录
+struct_data/
+orth/data/
+tools/
+plmsearchtools/
+Rostlab/prot_t5_xl_uniref50/
+rhea/*
+primate/
+data_available
+
+# 大文件类型（按需）
+

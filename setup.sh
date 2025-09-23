@@ -1,6 +1,5 @@
-#./bash
+#/bash
 
-tar -xyz data_source.tar.xz 
 
 
 cd ./tools/eggnog_mapper
@@ -11,10 +10,5 @@ echo y
 
 cd ./tools/clean
 python build.py install
-
-cd ./tools/OrthoFinder
-python setup.py
-
-
 
 

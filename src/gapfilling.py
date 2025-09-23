@@ -191,8 +191,27 @@ def gapfill(name,refname,grothmedium='min'):
         print('delete gene ',gene)
         cobra.manipulation.delete.remove_genes(model2,[geneid])
     print(model2.optimize().objective_value)
+    model2.compartments=refmodel.compartments
     if refname=='ecoli':
         cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
+        model2 = cobra.io.load_json_model(f'./working/{name}/{name}-GEM.json')
+        model2.id = f'{name}'
+        model2.name = f'{name}-GEM'
+        for i in model2.reactions:
+            keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
+            # 删除这些键
+            for k in keys_to_remove:
+                del i.annotation[k]
+        cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
+    cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+    model2=cobra.io.read_sbml_model(f'./working/{name}/{name}-GEM.xml')
+    model2.id = f'{name}'
+    model2.name = f'{name}-GEM'
+    for i in model2.reactions:
+        keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
+        # 删除这些键
+        for k in keys_to_remove:
+            del i.annotation[k]
     cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
 
 

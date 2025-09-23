@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/AlphaGEMs.iml" filepath="$PROJECT_DIR$/.idea/AlphaGEMs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/AlphaGEM.iml" filepath="$PROJECT_DIR$/.idea/AlphaGEM.iml" />
     </modules>
   </component>
 </project>

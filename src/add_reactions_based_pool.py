@@ -55,6 +55,9 @@ def model_reaction(name,refname):
     reactionpools=reactionpool.copy()
     # reactionpools=reactionpoolcomp('c','e',reactionpools)
     metdict={metss.name.lower():metss for metss in model.metabolites if metss.compartment=='c'}
+    for metss in model.metabolites:
+        if metss.compartment=='c':
+            metdict[metss.name.lower().replace('(','').replace(')','')]=metss
     for index, row in tqdm(gpr_e.iterrows()):
         reactions=[]
         reactions.append(str(row['rhea']))
@@ -78,24 +81,25 @@ def model_reaction(name,refname):
             if reaction_add.id in refids:
                 reaction_add=refmodel.reactions.get_by_id(reaction_add.id)
             for met in reaction_add.metabolites.keys():
+                 metsearch=met.name.lower() if met.name.lower() in list(metdict.keys()) else met.name.lower().replace('(','').replace(')','')
                  try:
+                     if metdict[metsearch].elements==met.elements and metdict[
+                         metsearch].charge==met.charge and metdict[metsearch].compartment==met.compartment:
+                         reaction_add.add_metabolites({metdict[metsearch]:reaction_add.metabolites[met],
+                                                       met:-1*reaction_add.metabolites[met]})
+                         print(f'{metsearch} is added to {reaction_add.id}')
+                         print(reaction_add.metabolites)
+                         continue
                      try:
-                       if (metdict[met.name.lower()].elements['H'] - met.elements['H'] == metdict[
-                         met.name.lower()].charge - met.charge and metdict[met.name.lower()].elements.pop(
-                         'H') == met.elements.pop('H')) and metdict[met.name.lower()].compartment==met.compartment:
-                         reaction_add.add_metabolites({metdict[met.name.lower()]: reaction_add.metabolites[met],
+                       if (metdict[metsearch].elements['H'] - met.elements['H'] == metdict[
+                         metsearch].charge - met.charge and metdict[metsearch].elements.pop(
+                         'H') == met.elements.pop('H')) and metdict[metsearch].compartment==met.compartment:
+                         reaction_add.add_metabolites({metdict[metsearch]: reaction_add.metabolites[met],
                                                        met: -1 * reaction_add.metabolites[met]})
-                         print(f'{met.name.lower()} is added to {reaction_add.name}')
+                         print(f'{metsearch} is added to {reaction_add.id}')
                          print(reaction_add.metabolites)
                      except:
                        pass
-
-                     if ((metdict[met.name.lower()].elements==met.elements and metdict[
-                         met.name.lower()].charge==met.charge)) and metdict[met.name.lower()].compartment==met.compartment:
-                         reaction_add.add_metabolites({metdict[met.name.lower()]:reaction_add.metabolites[met],
-                                                       met:-1*reaction_add.metabolites[met]})
-                         print(f'{met.name.lower()} is added to {reaction_add.name}')
-                         print(reaction_add.metabolites)
                  except KeyError as e:
                      print(e)
                      pass
@@ -105,4 +109,9 @@ def model_reaction(name,refname):
             except:
                 pass
     model.id=f'{name}-GEM'
+    for i in model.reactions:
+        keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
+        # 删除这些键
+        for k in keys_to_remove:
+            del i.annotation[k]
     cobra.io.save_yaml_model(model, f'./working/{name}/{name}-GEM_withgaps.yml')

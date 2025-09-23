@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/CLEAN/app/esm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/DeepProZyme" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/GraphEC" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tools/GraphEC/openfold" vcs="Git" />
   </component>
 </project>
