@@ -13,6 +13,8 @@ Rostlab/prot_t5_xl_uniref50/
 rhea/*
 primate/
 data_available
+bac/*
+
 
 # 大文件类型（按需）
 

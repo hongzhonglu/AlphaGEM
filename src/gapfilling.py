@@ -67,7 +67,7 @@ def gapfill(name,refname,grothmedium='min'):
     #     if fba.fluxes.get(solution1)>=1e-10 or fba.fluxes.get(solution1)<=-1e-10:
     #         reacgaps.append(gap.model.reactions.get_by_id(solution1))
     objectbound=refmodel.optimize().objective_value
-    gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=objectbound*0.5)
+    gapfiller = gapfilling.GapFiller(model2, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=min(objectbound*0.5,0.05))
     gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
     gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
     gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
@@ -93,7 +93,7 @@ def gapfill(name,refname,grothmedium='min'):
     if refname!='human' and refname!='strco':
         with open(f'data_available/{refname}_full_medium.pkl', 'rb') as file:
             fullmedium = pickle.load(file)
-        medium=refmodel.medium
+        medium=refmodel.medium.copy()
         refmodel.medium = fullmedium
         objectbound = refmodel.optimize().objective_value
         fba2=cobra.flux_analysis.pfba(refmodel)
@@ -102,7 +102,7 @@ def gapfill(name,refname,grothmedium='min'):
         # for solution1 in solution:
         #     if fba2.fluxes.get(solution1) >= 1e-10 or fba2.fluxes.get(solution1) <= -1e-10:
         #         reacgaps2.append(gap.model.reactions.get_by_id(solution1))
-        gapfiller = gapfilling.GapFiller(model, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=objectbound*0.5)
+        gapfiller = gapfilling.GapFiller(model2, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=min(objectbound*0.5,0.05))
         gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
         gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
         gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
@@ -172,10 +172,11 @@ def gapfill(name,refname,grothmedium='min'):
        #             model.reactions.get_by_id(re.id).compartments.add('c')
     if grothmedium=='min':
         model2.medium=medium
-    filter1=model2.optimize().objective_value#changed
+    #changed
     # with model2:
     #     nonfindreactions=[r.id for r in cobra.manipulation.delete.knock_out_model_genes(model2, nonfindgenes)]
     #     pd.DataFrame(nonfindreactions).to_excel(f'working/{name}/reacgaps_non_gene.xlsx')
+    filter1=min(model2.optimize().objective_value,0.1)
     for gene in nonfindgenes:
         try:
             geneid=model2.genes.get_by_id(gene)
@@ -184,7 +185,7 @@ def gapfill(name,refname,grothmedium='min'):
         with model2:
             cobra.manipulation.delete.knock_out_model_genes(model2,[geneid])
             try:
-              if model2.optimize().objective_value<=0.5*filter1:#changed
+              if model2.optimize().objective_value<=0.25*filter1:#changed
                 continue
             except:
                 continue
@@ -203,16 +204,18 @@ def gapfill(name,refname,grothmedium='min'):
             for k in keys_to_remove:
                 del i.annotation[k]
         cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
-    cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
-    model2=cobra.io.read_sbml_model(f'./working/{name}/{name}-GEM.xml')
-    model2.id = f'{name}'
-    model2.name = f'{name}-GEM'
-    for i in model2.reactions:
-        keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
-        # 删除这些键
-        for k in keys_to_remove:
-            del i.annotation[k]
-    cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+        cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+    else:
+        cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+        model2 = cobra.io.read_sbml_model(f'./working/{name}/{name}-GEM.xml')
+        model2.id = f'{name}'
+        model2.name = f'{name}-GEM'
+        for i in model2.reactions:
+            keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
+            # 删除这些键
+            for k in keys_to_remove:
+                del i.annotation[k]
+        cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
 
 
 

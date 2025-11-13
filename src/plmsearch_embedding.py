@@ -2,14 +2,16 @@ import argparse
 import torch
 import time
 import pickle
-
-from esm import FastaBatchedDataset, pretrained
-
+from esm.data import FastaBatchedDataset
+from esm import pretrained
+import argparse
+import torch.serialization as ts
+ts.add_safe_globals([argparse.Namespace])
 
 def embedding_generate(name,esm_model_path="./plmsearchtools/model/esm/esm1b_t33_650M_UR50S.pt", nogpu=False):
     embedding_result=f"./working/{name}/{name}_embedding.pkl"
     fasta=f"./working/{name}/{name}.fasta"
-    esm_model, alphabet = pretrained.load_model_and_alphabet(esm_model_path)
+    esm_model, alphabet = pretrained.load_model_and_alphabet_local(esm_model_path)
     esm_model.eval()
 
     if torch.cuda.is_available() and not nogpu:

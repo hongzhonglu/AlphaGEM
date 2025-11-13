@@ -97,18 +97,6 @@ def result_blast(name,refname,threshold):
         result_df.loc[index, "COV2"] = cov2
 
     result_df.to_csv(f"./working/{name}/{name}_ss_{str(threshold)}_blast_results.csv", index=False)
-    # 绘制频数分布直方图
-    plt.figure(figsize=(10, 6))
-    result_df['COV1'].plot(kind='hist', bins=50, edgecolor='black', alpha=0.7)
-    result_df['COV2'].plot(kind='hist', bins=50, edgecolor='red', alpha=0.7)
-    plt.title(f'Frequency Distribution of Coverage(ss_{threshold})')
-    plt.xlabel('Coverage')
-    plt.ylabel('Frequency')
-    # plt.xticks([i/10 for i in range(11)])  # 设置x轴刻度
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    # 保存图像到指定位置
-    output_path = f'./working/{name}/coverage.png'
-    plt.savefig(output_path, format='png', dpi=300)
     return result_df
 
 

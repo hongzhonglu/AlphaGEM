@@ -72,12 +72,15 @@ def model_reaction(name,refname):
                 break
         for rea in reactions:
             reaction_add=reactionpools.reactions.get_by_id('rhea_'+str(rea)+'_c')
+            if (reaction_add.reactants==[] or reaction_add.products==[]) and reaction_add.id not in refids:
+                print('reaction error')
+                continue
             if reaction_add.id in refids:
                 reaction_add=refmodel.reactions.get_by_id(reaction_add.id)
             reaction_add.gene_reaction_rule=row['reaction']
             if reaction_add.id=='rhea_24628_c' or reaction_add.id=='rhea_24632_c':
                 continue
-            reaction_add.annotation['from']='nonhomo'
+            reaction_add.annotation['from']='NonHomo'
             if reaction_add.id in refids:
                 reaction_add=refmodel.reactions.get_by_id(reaction_add.id)
             for met in reaction_add.metabolites.keys():

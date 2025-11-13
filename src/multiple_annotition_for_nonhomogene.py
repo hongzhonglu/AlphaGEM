@@ -24,8 +24,8 @@ def findtargetreaction(g, ec):
     reaction_query = f"""
        SELECT DISTINCT ?x ?reaction
        WHERE {{
-         ?x rdfs:subClassOf rh:Reaction ;
-            rh:ec <http://purl.uniprot.org/enzyme/{ec}> ; ;
+         ?x rdfs:subClassOf rh:Reaction .
+         ?x rh:ec <http://purl.uniprot.org/enzyme/{ec}> .
        }}
        LIMIT 100
        """
