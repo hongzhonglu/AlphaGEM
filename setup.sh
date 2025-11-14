@@ -3,7 +3,7 @@
 
 
 cd ./tools/eggnog_mapper
-python download_eggnog_data.py
+python download_eggnog_database.py
 echo y
 echo y
 echo y
