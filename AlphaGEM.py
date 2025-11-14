@@ -42,10 +42,10 @@ path_reference_structure=''
 
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--mode',type=str,default='structure alignment',choices=['structure alignment','plmsearch'])
-    parser.add_argument('--refname', type=str, help='reference name')
+    parser.add_argument('--mode',type=str,default='structure_alignment',choices=['structure alignment','plmsearch'])
+    parser.add_argument('--refname', default='yeast',type=str, help='reference name')
     parser.add_argument('--name', type=str, help='target GEMs name')
-    parser.add_argument('--fasta', type=str, help='your target species genome')
+    parser.add_argument('--fasta',default='', type=str, help='your target species genome')
     parser.add_argument('--maplist', type=str,default='', help='mapping list of structures and genes names')
     parser.add_argument('--structure', type=str,default='', help='files you store structures')
     parser.add_argument('--cleanuse', type=bool, help='whether you have used CLEAN')
@@ -61,7 +61,13 @@ def main():
     args = parser.parse_args()
     mode=args.mode
     fasta=args.fasta
+    if fasta=='':
+        print('No fasta file')
+        sys.exit()
     refname=args.refname
+    if refname=='':
+        print('please specify a reference name, we chosed yeast as default')
+        sys.exit()
     refmodel=''
     name=args.name
     listfile=args.maplist
@@ -91,7 +97,7 @@ def main():
     fasta_handle.handle(fasta,name)
     if not os.path.isfile(f'./working/{name}/{name}_embedding.pkl'):
         plmsearch_embedding.embedding_generate(name)
-    if mode=='structure alignment':
+    if mode=='structure_alignment':
         generate_list.generare_list_with_structure(name,listfile,structurefile)
         orthofinder_datahandle.datahandel(name,refname)
         US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
