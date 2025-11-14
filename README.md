@@ -32,7 +32,7 @@ Usage:
 
   Parameters:
   ========
-  - **--mode**: Workflow mode. Default: `structure alignment`. Choices: `structure alignment`, `plmsearch`
+  - **--mode**: Workflow mode. Default: `structure alignment`. Choices: `structure_alignment`, `plmsearch`
   - **--refname**: Reference species. Choices: `ecoli`, `yeast`, `strco`, `human`. Required
   - **--name**: Job/species name used to create `working/<name>`. Required
   - **--fasta**: Target species FASTA file path. Required
@@ -54,7 +54,7 @@ Usage:
   - **Structure alignment mode (default)**
 
         python AlphaGEM.py \
-          --mode "structure alignment" \
+          --mode "structure_alignment" \
           --name my_species \
           --refname yeast \
           --fasta ./input.fa \
