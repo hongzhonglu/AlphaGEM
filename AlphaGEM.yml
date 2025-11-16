@@ -201,7 +201,6 @@ dependencies:
       - deepspeed==0.16.2
       - depinfo==2.2.0
       - diskcache==5.6.3
-      - dllogger==1.0.0
       - dm-tree==0.1.8
       - easydict==1.13
       - einops==0.8.0
