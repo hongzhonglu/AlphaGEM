@@ -17,7 +17,7 @@ class InstallAndSetup(_install):
 
         _install.run(self)
         base_dir = os.path.abspath(os.path.dirname(__file__))
-        sh = os.path.join(base_dir, '/src/setup.sh')
+        sh = os.path.join(base_dir, '/setup.sh')
         if os.path.exists(sh):
             try:
                 subprocess.check_call(['bash', sh], cwd=base_dir)
