@@ -10,7 +10,9 @@ You can install AlphaGEM through git
    
     git clone https://github.com/hongzhonglu/AlphaGEMs.git AlphaGEM
 
-You can download supplyment resources from PanBaidu:
+You can download supplyment resources from figshare:
+
+    10.6084/m9.figshare.30630524
 
 ## Prepare envrionment: #
 It need to create two enviroment as DeepECtransformer uses the old version of pytorch.
