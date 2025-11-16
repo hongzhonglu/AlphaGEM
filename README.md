@@ -1,3 +1,4 @@
+Platform: Ubuntu only (tested on Ubuntu 20.04/22.04).
 Installation:
 ======
 You can install AlphaGEM through git
@@ -11,19 +12,20 @@ you should create two enviroment as Deepectransformer use the old version of tra
 
 * 1.create environment for AlphaGEM:
 
-      conda create -n AlphaGEM 
+      conda env create -f AlphaGEM.yml
 
 * 2.create enviroment for deepectransformer:
   
-      conda create -n deepectransformer
+      conda env create -f deepecenvironment.yml
   
-* 3.prepare the source data: 
+* 3.activate AlphaGEM environment:
   
-      bash ./setup.sh
-
-* 4.prepare dataset for eggnog-mapper:
-
-      python ./tools/eggnog_mapper/download_eggnog_database.py     
+      conda activate AlphaGEM
+  
+* 4.prepare the source data: 
+  
+      python setup.py install
+     
 
 Usage:
 ======
@@ -32,7 +34,7 @@ Usage:
 
   Parameters:
   ========
-  - **--mode**: Workflow mode. Default: `structure alignment`. Choices: `structure_alignment`, `plmsearch`
+  - **--mode**: Workflow mode. Default: `structure alignment`. Choices: `structure alignment`, `plmsearch`
   - **--refname**: Reference species. Choices: `ecoli`, `yeast`, `strco`, `human`. Required
   - **--name**: Job/species name used to create `working/<name>`. Required
   - **--fasta**: Target species FASTA file path. Required
@@ -54,7 +56,7 @@ Usage:
   - **Structure alignment mode (default)**
 
         python AlphaGEM.py \
-          --mode "structure_alignment" \
+          --mode "structure alignment" \
           --name my_species \
           --refname yeast \
           --fasta ./input.fa \
