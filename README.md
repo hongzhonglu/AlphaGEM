@@ -27,7 +27,23 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
   
       conda activate AlphaGEM
   
-* 4.prepare the source data: 
+* 4.install PyTorch (choose one):
+
+  - CPU only:
+
+        pip install --index-url https://download.pytorch.org/whl/cpu \
+          torch==2.9.0 torchvision==0.24.0 torchtext==0.18.0
+
+  - CUDA 13.0:
+
+        pip install --index-url https://download.pytorch.org/whl/cu130 \
+          torch==2.9.0 torchvision==0.24.0 torchtext==0.18.0
+
+* 5.install ESM (provides `esm` package used by embeddings):
+
+      pip install fair-esm==2.0.0
+
+* 6.prepare the source data: 
   
       python setup.py install
      
