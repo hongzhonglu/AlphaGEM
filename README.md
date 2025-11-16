@@ -1,7 +1,7 @@
 AlphaGEM
 ======
  ## Platform: Ubuntu only (tested on Ubuntu 20.04/22.04). #
- ## Installation: #
+Installation:
 ======
 You can install AlphaGEM through git
    
@@ -9,7 +9,7 @@ You can install AlphaGEM through git
 
 You can download supplyment resources from PanBaidu:
 
-  ## envrionment: #
+envrionment: 
 ======
 you should create two enviroment as Deepectransformer use the old version of transformer.
 
