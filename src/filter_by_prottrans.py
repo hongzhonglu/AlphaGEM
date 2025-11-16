@@ -41,8 +41,12 @@ def embedding(sequences):
     with torch.no_grad():
         embedding_repr = model(input_ids=input_ids, attention_mask=attention_mask)
     embs=[]
-    for number,sequence in enumerate(sequences):
-        embs.append(embedding_repr.last_hidden_state[number,:len(sequence)].mean(dim=0).numpy())
+    if device == torch.device("cpu"):
+        for number,sequence in enumerate(sequences):
+            embs.append(embedding_repr.last_hidden_state[number,:len(sequence)].mean(dim=0).numpy())
+    else:
+        for number, sequence in enumerate(sequences):
+            embs.append(embedding_repr.last_hidden_state[number, :len(sequence)].mean(dim=0).cpu().numpy())
     return embs
 
 def findtargethomos(data,dataindex):

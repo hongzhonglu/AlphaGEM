@@ -191,7 +191,7 @@ def rhea_search(name, refname, threshold=0.8, save_model_path="./plmsearchtools/
     return None
 
 def ss_predictor_spe(refname,name,threshold=0.8,save_model_path="./plmsearchtools/model/plmsearch.sav"):
-    input_query_embedding = f"./working/{name}_embedding.pkl"
+    input_query_embedding = f"./working/{name}/{name}_embedding.pkl"
     input_target_embedding=f"./working/{refname}_embedding.pkl"
     with open(input_query_embedding, 'rb') as handle:
         query_embedding_dic = pickle.load(handle)
@@ -213,7 +213,7 @@ def ss_predictor_spe(refname,name,threshold=0.8,save_model_path="./plmsearchtool
         model_methods = model.module
     model.to(device)
 
-    output_search_result = f"./ziyuan//{name}_ss_predictor_filter{str(threshold)}"
+    output_search_result = f"./working/{name}/{name}_ss_predictor_filter{str(threshold)}"
 
     with open(output_search_result, 'w') as f:
         pass

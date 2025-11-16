@@ -3,3 +3,6 @@ python AlphaGEM.py --name mouse --refname human --fasta working/mouse/mouse.fast
 打分参数：3221
 酵母：全默认，打分参数：3231
 klepo：全默认，打分参数：3221
+test:
+python AlphaGEM.py --name candida --mode structure_alignment --fasta ./working/candida/candida.fasta --refname yeast
+python AlphaGEM.py --name candida --mode plmsearch --fasta ./working/candida/candida.fasta --refname yeast

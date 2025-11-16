@@ -42,7 +42,7 @@ path_reference_structure=''
 
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--mode',type=str,default='structure_alignment',choices=['structure alignment','plmsearch'])
+    parser.add_argument('--mode',type=str,default='structure_alignment',choices=['structure_alignment','plmsearch'])
     parser.add_argument('--refname', default='yeast',type=str, help='reference name')
     parser.add_argument('--name', type=str, help='target GEMs name')
     parser.add_argument('--fasta',default='', type=str, help='your target species genome')
