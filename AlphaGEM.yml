@@ -202,7 +202,6 @@ dependencies:
       - dm-tree==0.1.8
       - easydict==1.13
       - einops==0.8.0
-      - escher==1.8.1
       - et-xmlfile==2.0.0
       - exceptiongroup==1.2.2
       - executing==2.1.0
