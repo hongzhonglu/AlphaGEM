@@ -12,7 +12,7 @@ You can install AlphaGEM through git
 
 You can download supplyment resources from figshare:
 
-[Data Source Figshare](10.6084/m9.figshare.30630524)
+[Data Source Figshare](dx.doi.org/10.6084/m9.figshare.30630524)
 
 ## Prepare envrionment: #
 It need to create two enviroment as DeepECtransformer uses the old version of pytorch.
