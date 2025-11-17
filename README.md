@@ -12,7 +12,7 @@ You can install AlphaGEM through git
 
 You can download supplyment resources from figshare:
 
-    10.6084/m9.figshare.30630524
+[Data Source Figshare](10.6084/m9.figshare.30630524)
 
 ## Prepare envrionment: #
 It need to create two enviroment as DeepECtransformer uses the old version of pytorch.
@@ -33,7 +33,7 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
  
    Please install a compatible combination of `PyTorch`, `CUDA`, and `cuDNN` for your system yourself. (Recommended `PyTorch` version: >= 2.4.0)
   
-   Use the official selector to obtain the correct command for your OS and CUDA version: `https://pytorch.org/get-started/locally/`
+   Use the official selector to obtain the correct command for your OS and CUDA version: [PyTorch Local Installation](https://pytorch.org/get-started/locally/)
   
    Tested platform for this project: `PyTorch 2.9.0` + `CUDA 13.0` on `Nvidia GeForce RTX 5080` and `RTX 5070ti`.
 
