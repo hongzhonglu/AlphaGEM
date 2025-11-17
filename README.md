@@ -1,5 +1,7 @@
 AlphaGEM
 ======
+_AlphaGEM Enables Precise Genome-Scale Metabolic Modelling by Integrating Protein Structure Alignment with deep-learning-based Dark Metabolism Mining_
+_doi: https://doi.org/10.1101/2025.07.21.665674_
  ## Platform: Ubuntu only (tested on Ubuntu 20.04/22.04). #
 
  
@@ -12,7 +14,7 @@ You can install AlphaGEM through git
 
 You can download supplyment resources from figshare:
 
-    10.6084/m9.figshare.30630524
+[Data Source Figshare](https://dx.doi.org/10.6084/m9.figshare.30630524)
 
 ## Prepare envrionment: #
 It need to create two enviroment as DeepECtransformer uses the old version of pytorch.
@@ -29,17 +31,13 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
   
       conda activate AlphaGEM
   
-* 4.install PyTorch (choose one):
-
-  - CPU only:
-
-        pip install --index-url https://download.pytorch.org/whl/cpu \
-          torch==2.9.0 torchvision==0.24.0
-
-  - CUDA 13.0:
-
-        pip install --index-url https://download.pytorch.org/whl/cu130 \
-          torch==2.9.0 torchvision==0.24.0
+* 4.install PyTorch/CUDA/cuDNN:
+ 
+   Please install a compatible combination of `PyTorch`, `CUDA`, and `cuDNN` for your system yourself. (Recommended `PyTorch` version: >= 2.4.0)
+  
+   Use the official selector to obtain the correct command for your OS and CUDA version: [PyTorch Local Installation](https://pytorch.org/get-started/locally/)
+  
+   Tested platform for this project: `PyTorch 2.9.0` + `CUDA 13.0` on `Nvidia GeForce RTX 5080` and `RTX 5070ti`.
 
 * 5.install ESM (provides `esm` package used by embeddings):
 
