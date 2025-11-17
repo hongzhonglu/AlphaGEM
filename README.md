@@ -31,11 +31,11 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
   
 * 4.install PyTorch/CUDA/cuDNN:
  
-   Please install a compatible combination of PyTorch, CUDA, and cuDNN for your system yourself. (Recommended PyTorch version: >= 2.4.0)
+   Please install a compatible combination of `PyTorch`, `CUDA`, and `cuDNN` for your system yourself. (Recommended `PyTorch` version: >= 2.4.0)
   
-   Use the official selector to obtain the correct command for your OS and CUDA version: https://pytorch.org/get-started/locally/
+   Use the official selector to obtain the correct command for your OS and CUDA version: `https://pytorch.org/get-started/locally/`
   
-   Tested platform for this project: PyTorch 2.9.0 + CUDA 13.0 on Nvidia GeForce RTX 5080 and RTX 5070ti.
+   Tested platform for this project: `PyTorch 2.9.0` + `CUDA 13.0` on `Nvidia GeForce RTX 5080` and `RTX 5070ti`.
 
 * 5.install ESM (provides `esm` package used by embeddings):
 
