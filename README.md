@@ -43,7 +43,7 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
 
       pip install fair-esm==2.0.0
 
-* __6.prepare the source data: __
+* __6.prepare the source data:__
   
       python setup.py install
 
