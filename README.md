@@ -46,8 +46,15 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
 * 6.prepare the source data: 
   
       python setup.py install
-     
 
+* 7.Gurobi license (if you don’t have one yet)
+
+  We recommend obtaining a valid Gurobi license. Otherwise, adjust the code to use a different optimizer. To retrieve your license:
+
+      grbgetkey <YOUR-LICENSE-KEY>
+  
+  For details, see the Gurobi licensing guide: https://www.gurobi.com/documentation/
+ 
 Usage:
 ======
 
