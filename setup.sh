@@ -64,9 +64,9 @@ if [ -d "./tools/eggnog_mapper" ]; then
 else
   log "eggnog_mapper directory not found, skip"
 fi
-if [ -d "./tools/CLEAN" ]; then
-  log "Installing CLEAN from ./tools/CLEAN"
-  pushd ./tools/CLEAN >/dev/null
+if [ -d "./tools/CLEAN/app" ]; then
+  log "Installing CLEAN from ./tools/CLEAN/app"
+  pushd ./tools/CLEAN/app >/dev/null
   "$PYTHON" build.py install
   popd >/dev/null
   if "$PYTHON" - <<'PY'
