@@ -84,7 +84,7 @@ fi
 if [ -d "./tools/OrthoFinder" ]; then
   log "Preparing OrthoFinder"
   pushd ./tools/OrthoFinder >/dev/null
-  "$PYTHON" setup.py
+  "$PYTHON" setup.py install
   popd >/dev/null
 else
   log "OrthoFinder directory not found, skip"
