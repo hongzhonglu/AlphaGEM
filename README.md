@@ -19,19 +19,19 @@ You can download supplyment resources from figshare:
 ## Prepare envrionment: #
 It need to create two enviroment as DeepECtransformer uses the old version of pytorch.
 
-* 1.create environment for AlphaGEM:
+* __1.create environment for AlphaGEM:__
 
       conda env create -f AlphaGEM.yml
 
-* 2.create enviroment for deepectransformer:
+* __2.create enviroment for deepectransformer:__
   
       conda env create -f deepecenvironment.yml
   
-* 3.activate AlphaGEM environment:
+* __3.activate AlphaGEM environment:__
   
       conda activate AlphaGEM
   
-* 4.install PyTorch/CUDA/cuDNN:
+* __4.install PyTorch/CUDA/cuDNN:__
  
    Please install a compatible combination of `PyTorch`, `CUDA`, and `cuDNN` for your system yourself. (Recommended `PyTorch` version: >= 2.4.0)
   
@@ -39,15 +39,15 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
   
    Tested platform for this project: `PyTorch 2.9.0` + `CUDA 13.0` on `Nvidia GeForce RTX 5080` and `RTX 5070ti`.
 
-* 5.install ESM (provides `esm` package used by embeddings):
+* __5.install ESM (provides `esm` package used by embeddings):__
 
       pip install fair-esm==2.0.0
 
-* 6.prepare the source data: 
+* __6.prepare the source data: __
   
       python setup.py install
 
-* 7.Gurobi license (if you don’t have one yet)
+* __7.Gurobi license (if you don’t have one yet)__
 
   We recommend obtaining a valid Gurobi license. Otherwise, adjust the code to use a different optimizer. To retrieve your license:
 
