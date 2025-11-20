@@ -54,6 +54,16 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
       grbgetkey <YOUR-LICENSE-KEY>
   
   For details, see the Gurobi licensing guide: https://www.gurobi.com/documentation/
+
+Test:
+======
+   Structure alignment mode
+   
+      python AlphaGEM.py --name candida --mode structure_alignment --fasta ./working/candida/candida.fasta --refname yeast
+      
+   PLMsearch mode
+   
+      python AlphaGEM.py --name candida --mode plmsearch --fasta ./working/candida/candida.fasta --refname yeast
  
 Usage:
 ======
@@ -76,7 +86,7 @@ Usage:
   - **--esp**: Clustering parameter. Default: 1
   - **--grothmedium**: Growth medium. Default: `min`; choices: `min`, `full`
 
- ## Examples: #
+ ## Tutorials: #
   - **Structure alignment mode (default)**
 
         python AlphaGEM.py \
@@ -85,7 +95,6 @@ Usage:
           --refname yeast \
           --fasta ./input.fa \
           --cleanuse True \
-          --TMscore 0.7 --coverage 0.8 --pLDDT 70
 
   - **PLMSearch mode**
 
