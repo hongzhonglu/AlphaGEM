@@ -57,6 +57,9 @@ It need to create two enviroment as DeepECtransformer uses the old version of py
 
 Test:
 ======
+   
+   ## Create GEM for _C. albicans_ #
+   
    Structure alignment mode
    
       python AlphaGEM.py --name candida --mode structure_alignment --fasta ./working/candida/candida.fasta --refname yeast
