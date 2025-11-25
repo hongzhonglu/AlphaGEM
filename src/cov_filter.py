@@ -257,10 +257,12 @@ def bbh(name,refname,threshold,cov_thre=0.25,pid_thre=50,direction="bidirect"):
         bbh_df = bbh_df[bbh_df["BBH"] == '<=>']
     else:
         pass
-    bbh_df = bbh_df[bbh_df["PID"] > pid_thre]
-    bbh_df['subject'] = bbh_df['subject'].replace(gene_dict2)
-    bbh_df.rename(columns={"subject": 'Gene1', 'gene': 'Gene2'}, inplace=True)
-    bbh_df.to_excel(f"./working/{name}/{name}_ss{threshold}_bbh_pid{str(pid_thre)}_cov{str(cov_thre)}_{direction}.xlsx")
+    if len(bbh_df) != 0:
+        bbh_df = bbh_df[bbh_df["PID"] > pid_thre]
+        bbh_df['subject'] = bbh_df['subject'].replace(gene_dict2)
+        bbh_df.rename(columns={"subject": 'Gene1', 'gene': 'Gene2'}, inplace=True)
+    bbh_df.to_excel(
+            f"./working/{name}/{name}_ss{threshold}_bbh_pid{str(pid_thre)}_cov{str(cov_thre)}_{direction}.xlsx")
 
 
 def cov_filter(name,refname,threshold,cov_threshold,id_threshold):
@@ -275,7 +277,10 @@ def cov_filter(name,refname,threshold,cov_threshold,id_threshold):
 def merge(name,refname,threshold,cov_threshold,id_threshold,cov_thre,pid_thre,direction):
     bbh_df=pd.read_excel(f"./working/{name}/{name}_ss{threshold}_bbh_pid{str(pid_thre)}_cov{str(cov_thre)}_{direction}.xlsx")
     df=pd.read_csv(f"./working/{name}/{name}_ss_{str(threshold)}_blast_cov{str(cov_threshold)}_id{str(id_threshold)}.csv")
-    merged_df = pd.merge(bbh_df, df, on=['Gene1', 'Gene2'], how="outer")
+    if len(bbh_df) != 0:
+        merged_df = pd.merge(bbh_df, df, on=['Gene1', 'Gene2'], how="outer")
+    else:
+        merged_df = df
     merged_df.to_excel(f"./working/{name}/{name}_ss{threshold}_cov{str(cov_threshold)}_id{str(id_threshold)}_bbh_pid{str(pid_thre)}_cov{str(cov_thre)}_{direction}.xlsx", header=True)
 
 # def evaluate(name,refname,threshold,cov_threshold,cov_thre,pid_thre,direction):
