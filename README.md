@@ -73,7 +73,7 @@ Usage:
 
  ## Parameters: #
   - **--mode**: Workflow mode. Default: `structure_alignment`. Choices: `structure_alignment`, `plmsearch`
-  - **--refname**: Reference species. Choices: `ecoli`, `yeast`, `strco`, `human`. Required
+  - **--refname**: Reference species. Choices: `ecoli`, `yeast`, `strco`, `human`, `synechocystis`. Required
   - **--name**: Job/species name used to create `working/<name>`. Required
   - **--fasta**: Target species FASTA file path. Required
   - **--list**: Path to a list file of structures and gene names. Default: empty
