@@ -35,6 +35,8 @@ def gapfill(name,refname,grothmedium='min'):
         refmodel=cobra.io.read_sbml_model('models/Sco-GEM.xml')
     if refname=='human':
         refmodel = cobra.io.read_sbml_model('models/Human-GEM.xml')
+    if refname == 'synechocystis':
+        refmodel = cobra.io.read_sbml_model('models/iSynCJ816.xml')
     findrefnames.predata(refname)
     model = cobra.io.load_yaml_model(f'working/{name}/{name}-GEM_withgaps.yml')
     if refname == 'human':
@@ -90,7 +92,7 @@ def gapfill(name,refname,grothmedium='min'):
             except:
                 continue
     medium = refmodel.medium
-    if refname!='human' and refname!='strco':
+    if refname!='human' and refname!='strco' and refname!='synechocystis':
         with open(f'data_available/{refname}_full_medium.pkl', 'rb') as file:
             fullmedium = pickle.load(file)
         medium=refmodel.medium.copy()

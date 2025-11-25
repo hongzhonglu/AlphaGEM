@@ -38,7 +38,7 @@ def modelbuild(refmodel,name,mincomp=0.8):
     tarname = name
     tarmod = cobra.io.load_yaml_model(f'working/{name}/model1{name}.yml')
     print('imported target model')
-    if refmodel=='yeast-GEM.xml' or refmodel=='Sco-GEM.xml' or refmodel=='Human-GEM.xml':
+    if refmodel=='yeast-GEM.xml' or refmodel=='Sco-GEM.xml' or refmodel=='Human-GEM.xml' or refmodel=='iSynCJ816.xml':
       ymod = cobra.io.read_sbml_model(f'models/{refmodel}')
     if refmodel=='iML1515.json':
         ymod=cobra.io.load_json_model(f'models/{refmodel}')

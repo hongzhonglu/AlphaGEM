@@ -43,6 +43,8 @@ def model_reaction(name,refname):
         refmodel=cobra.io.read_sbml_model('models/Sco-GEM.xml')
     if refname=='human':
         refmodel = cobra.io.read_sbml_model('models/Human-GEM.xml')
+    if refname == 'synechocystis':
+        refmodel = cobra.io.read_sbml_model('models/iSynCJ816.xml')
     refids=[r.id for r in refmodel.reactions]
     model = cobra.io.load_yaml_model(f'./working/{name}/model2{name}.yml')
     fba_begin=model.optimize().objective_value

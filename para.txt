@@ -6,3 +6,6 @@ klepo：全默认，打分参数：3221
 test:
 python AlphaGEM.py --name candida --mode structure_alignment --fasta ./working/candida/candida.fasta --refname yeast
 python AlphaGEM.py --name candida --mode plmsearch --fasta ./working/candida/candida.fasta --refname yeast
+
+
+如果你要使用结构比对，请提供结构数据存在的目录：structure，并且提供以这样的格式为column存在的全基因组的表格数据：Entry，Entry Name，Structure，其中Entry与fasta文件中的基因id一致

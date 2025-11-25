@@ -90,14 +90,28 @@ Usage:
   - **--grothmedium**: Growth medium. Default: `min`; choices: `min`, `full`
 
  ## Tutorials: #
+
+ ## Examples: #
   - **Structure alignment mode (default)**
+  
+    > **Pre-requisites for Structure Alignment:**
+    > If you perform structure alignment, please provide:
+    > 1. A directory containing structure data via the `--structure` parameter.
+    > 2. A genome-wide table file via the `--list` parameter. 
+    >
+    > **List File Format Requirements:**
+    > *   The table must contain the following columns: **Entry**, **Entry Name**, **Structure**.
+    > *   The content of the **Entry** column must strictly match the gene IDs provided in your `--fasta` file.
 
         python AlphaGEM.py \
-          --mode "structure_alignment" \
+          --mode "structure alignment" \
           --name my_species \
           --refname yeast \
-          --fasta ./input.fa \
+          --fasta ./my_species.fasta \
+          --structure ./structure_dir \
+          --list ./my_species.xlsx \
           --cleanuse True \
+          --TMscore 0.7 --coverage 0.8 --pLDDT 70
 
   - **PLMSearch mode**
 
@@ -105,4 +119,4 @@ Usage:
           --mode plmsearch \
           --name my_species \
           --refname ecoli \
-          --fasta ./input.fa
+          --fasta ./my_species.fasta

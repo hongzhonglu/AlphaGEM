@@ -44,7 +44,7 @@ def embedding_generate(name,esm_model_path="esm1b_t33_650M_UR50S", nogpu=False):
         with open(embedding_result, 'wb') as handle:
             pickle.dump(embedding_result_dic, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def embedding_generate_base(name,esm_model_path="./plmsearchtools/model/esm/esm1b_t33_650M_UR50S.pt", nogpu=False):
+def embedding_generate_base(name,esm_model_path="esm1b_t33_650M_UR50S", nogpu=False):
     embedding_result=f"./working/{name}_embedding.pkl"
     fasta=f"./data_available/{name}.fasta"
     esm_model, alphabet = pretrained.load_model_and_alphabet(esm_model_path)

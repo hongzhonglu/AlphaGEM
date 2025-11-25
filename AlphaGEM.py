@@ -43,7 +43,7 @@ path_reference_structure=''
 def main():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--mode',type=str,default='structure_alignment',choices=['structure_alignment','plmsearch'])
-    parser.add_argument('--refname', default='yeast',type=str, help='reference name')
+    parser.add_argument('--refname', default='yeast',type=str, help='reference name',choices=['yeast','human','ecoli','strco','synechocystis'])
     parser.add_argument('--name', type=str, help='target GEMs name')
     parser.add_argument('--fasta',default='', type=str, help='your target species genome')
     parser.add_argument('--maplist', type=str,default='', help='mapping list of structures and genes names')
@@ -90,6 +90,8 @@ def main():
         refmodel = 'Sco-GEM.xml'
     if refname == 'human':
         refmodel = 'Human-GEM.xml'
+    if refname == 'synechocystis':
+        refmodel = 'iSynCJ816.xml'
     try:
         os.mkdir(f'./working/{name}')
     except FileExistsError:
