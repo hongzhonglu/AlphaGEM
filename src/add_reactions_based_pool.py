@@ -2,6 +2,10 @@ import cobra
 import pandas as pd
 import pickle
 from tqdm import tqdm
+
+from src.all_part import already
+
+
 def check_reactions(reac,model):
     result={}
     for met in reac.metabolites.keys():
@@ -63,6 +67,8 @@ def model_reaction(name,refname):
     for index, row in tqdm(gpr_e.iterrows()):
         reactions=[]
         reactions.append(str(row['rhea']))
+        # if reactions[0]=='22668':
+        #     break
         while True:
             found = False
             for item in reactions[:]:
@@ -73,40 +79,46 @@ def model_reaction(name,refname):
             if not found:
                 break
         for rea in reactions:
+            already =0
             reaction_add=reactionpools.reactions.get_by_id('rhea_'+str(rea)+'_c')
             if (reaction_add.reactants==[] or reaction_add.products==[]) and reaction_add.id not in refids:
                 print('reaction error')
                 continue
             if reaction_add.id in refids:
                 reaction_add=refmodel.reactions.get_by_id(reaction_add.id)
+                already=1
             reaction_add.gene_reaction_rule=row['reaction']
             if reaction_add.id=='rhea_24628_c' or reaction_add.id=='rhea_24632_c':
                 continue
             reaction_add.annotation['from']='NonHomo'
-            if reaction_add.id in refids:
-                reaction_add=refmodel.reactions.get_by_id(reaction_add.id)
-            for met in reaction_add.metabolites.keys():
+            #TODO: DEBUG REACTION ERROR OCCUR
+            a=list(reaction_add.metabolites.keys())
+            for met in a:
+                 if already==1:
+                     continue
+                 try:
+                     model.metabolites.get_by_id(met)
+                     continue
+                 except:
+                     pass
                  metsearch=met.name.lower() if met.name.lower() in list(metdict.keys()) else met.name.lower().replace('(','').replace(')','')
                  try:
                      if metdict[metsearch].elements==met.elements and metdict[
                          metsearch].charge==met.charge and metdict[metsearch].compartment==met.compartment:
-                         reaction_add.add_metabolites({metdict[metsearch]:reaction_add.metabolites[met],
-                                                       met:-1*reaction_add.metabolites[met]})
-                         print(f'{metsearch} is added to {reaction_add.id}')
-                         print(reaction_add.metabolites)
+                         stoich=reaction_add.metabolites[met]
+                         reaction_add.add_metabolites({metdict[metsearch]:stoich})
+                         reaction_add.add_metabolites({met:-1*stoich})
                          continue
                      try:
                        if (metdict[metsearch].elements['H'] - met.elements['H'] == metdict[
                          metsearch].charge - met.charge and metdict[metsearch].elements.pop(
                          'H') == met.elements.pop('H')) and metdict[metsearch].compartment==met.compartment:
-                         reaction_add.add_metabolites({metdict[metsearch]: reaction_add.metabolites[met],
-                                                       met: -1 * reaction_add.metabolites[met]})
-                         print(f'{metsearch} is added to {reaction_add.id}')
-                         print(reaction_add.metabolites)
+                         stoich = reaction_add.metabolites[met]
+                         reaction_add.add_metabolites({metdict[metsearch]: reaction_add.metabolites[stoich],
+                                                       met: -1 * reaction_add.metabolites[stoich]})
                      except:
                        pass
                  except KeyError as e:
-                     print(e)
                      pass
             try:
                 if check_reactions(reaction_add, model)!=0:
