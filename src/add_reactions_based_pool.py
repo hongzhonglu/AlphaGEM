@@ -3,8 +3,6 @@ import pandas as pd
 import pickle
 from tqdm import tqdm
 
-from src.all_part import already
-
 
 def check_reactions(reac,model):
     result={}
