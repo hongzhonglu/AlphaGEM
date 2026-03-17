@@ -14,6 +14,9 @@ Rostlab/prot_t5_xl_uniref50/
 rhea/*
 primate/
 data_available
+data_source.tar.xz
+data_source.tar.xz.sha256
+
 
 
 # 大文件类型（按需）
