@@ -3,7 +3,7 @@ tmpFolder/*
 temp/*
 working/*
 calculate/
-src/_pycache_
+src/_pycache_/
 bac/*
 # 明显超大数据目录
 struct_data/
@@ -14,6 +14,7 @@ Rostlab/prot_t5_xl_uniref50/
 rhea/*
 primate/
 data_available
+TODO/
 
 
 # 大文件类型（按需）
