@@ -9,7 +9,11 @@ def foldseek_choose(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,cov
     gx2 = pd.DataFrame()
     for i in range(len(gx.index)):
         if model_transpoter_found.transpoter(gx.iat[i, 1]) == 1:
-            if gx.iat[i, 5] > TMscoretrans and gx.iat[i, 6] > TMscoretrans and gx.iat[i, 7] > pLDDt and gx.iat[i, 8] > pLDDt and gx.iat[i, 4] >= coveragetrans and align2.align(gx.iat[i, 1],gx.iat[i, 2])>0.3:
+            try:
+                algnmentscore=align2.align(gx.iat[i, 1],gx.iat[i, 2])
+            except:
+                algnmentscore=0.4
+            if gx.iat[i, 5]+gx.iat[i, 6] > 2*coveragetrans and gx.iat[i, 7] > pLDDt and gx.iat[i, 8] > pLDDt and gx.iat[i, 4] >= TMscoretrans and algnmentscore>0.2:
                 gx2 = pd.concat([gx2, pd.DataFrame({
                     'gene1': [gx.iat[i, 1]],
                     'gene2': [gx.iat[i, 2]],
@@ -18,8 +22,8 @@ def foldseek_choose(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,cov
                     'sumscore': [(gx.iat[i, 5]+gx.iat[i, 6])/2+gx.iat[i, 4]],
                     'transporter':[True]
                 })])
-        elif gx.iat[i, 5] > TMscore and gx.iat[i, 6] > TMscore and gx.iat[i, 7] > pLDDt and gx.iat[i, 8] > pLDDt and gx.iat[
-            i, 4] >= coverage:
+        elif gx.iat[i, 5]+ gx.iat[i, 6] >2* coverage and gx.iat[i, 7] > pLDDt and gx.iat[i, 8] > pLDDt and gx.iat[
+            i, 4] >= TMscore:
             gx2 = pd.concat([gx2, pd.DataFrame({
                 'gene1': [gx.iat[i, 1]],
                 'gene2': [gx.iat[i, 2]],
@@ -39,4 +43,4 @@ def foldseek_choose(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,cov
         gx2.iat[i, 0] = yea2[index]
     gx2.to_excel(f'./working/{name}/matrix_foldseek_filtered2_{name}.xlsx')
 def foldseek_choose2(refname,refmodel,name,TMscoretrans=0.7,coveragetrans=0.8,TMscore=0.7,coverage=0.8,pLDDt=70):
-    foldseek_choose(refname,refmodel,name,coveragetrans,TMscoretrans,coverage,TMscore,pLDDt)
+    foldseek_choose(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDt)

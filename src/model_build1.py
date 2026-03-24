@@ -111,10 +111,10 @@ def modelbuild(refmodel,name=''):
     cangenes = []
     canmod = cobra.Model(f'{name}_model')
     global ymod
-    if refmodel=='yeast-GEM.xml' or refmodel=='Sco-GEM.xml' or refmodel=='Human-GEM.xml' or refmodel=='iSynCJ816.xml':
-        ymod = cobra.io.read_sbml_model(f'models/{refmodel}')
-    if refmodel=='iML1515.json':
-        ymod = cobra.io.load_json_model(f'models/{refmodel}')
+    # if refmodel=='yeast-GEM.xml' or refmodel=='Sco-GEM.xml' or refmodel=='Human-GEM.xml' or refmodel=='iSynCJ816.xml' or refmodel=='universal-GEM.xml':
+    ymod = cobra.io.read_sbml_model(f'models/{refmodel}')
+    # if refmodel=='iML1515.json' :
+    #     ymod = cobra.io.load_json_model(f'models/{refmodel}')
     gx3=gx_get(name)
     gx3.columns=['number','refmodelgene','tarmodelgene']
     dict={}

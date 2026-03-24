@@ -19,34 +19,8 @@ def check_reactions(reac,model):
     return 1
 
 
-# def reactionpoolcomp(compartment,transportout,reactionpool):
-#     for reaction in reactionpool.reactions:
-#         if len(reaction.compartments) == 1:
-#             reaction.id=reaction.id+'_'+compartment
-#         else:
-#             reaction.id=reaction.id+'_'+compartment
-#     for metbolites in reactionpool.metabolites:
-#         if metbolites.compartment == 'out':
-#             metbolites.id=metbolites.id.split('_')[0]+'_'+transportout
-#             metbolites.compartment=transportout
-#         else:
-#             metbolites.id=metbolites.id.split('_')[0]+'_'+compartment
-#             metbolites.compartment=compartment
-#     return reactionpool
-
-
-
-def model_reaction(name,refname):
-    if refname=='yeast':
-        refmodel = cobra.io.read_sbml_model('models/yeast-GEM.xml')
-    if refname=='ecoli':
-        refmodel=cobra.io.load_json_model('models/iML1515.json')
-    if refname=='strco':
-        refmodel=cobra.io.read_sbml_model('models/Sco-GEM.xml')
-    if refname=='human':
-        refmodel = cobra.io.read_sbml_model('models/Human-GEM.xml')
-    if refname == 'synechocystis':
-        refmodel = cobra.io.read_sbml_model('models/iSynCJ816.xml')
+def model_reaction(name,refmodel):
+    refmodel=cobra.io.read_sbml_model(f'models/{refmodel}')
     refids=[r.id for r in refmodel.reactions]
     model = cobra.io.load_yaml_model(f'./working/{name}/model2{name}.yml')
     fba_begin=model.optimize().objective_value
@@ -57,7 +31,6 @@ def model_reaction(name,refname):
     pklopen.close()
     Reactions=[]
     reactionpools=reactionpool.copy()
-    # reactionpools=reactionpoolcomp('c','e',reactionpools)
     metdict={metss.name.lower():metss for metss in model.metabolites if metss.compartment=='c'}
     for metss in model.metabolites:
         if metss.compartment=='c':
@@ -65,20 +38,18 @@ def model_reaction(name,refname):
     for index, row in tqdm(gpr_e.iterrows()):
         reactions=[]
         reactions.append(str(row['rhea']))
-        # if reactions[0]=='22668':
-        #     break
-        while True:
-            found = False
-            for item in reactions[:]:
-                if item in general2spe:
-                    found = True
-                    reactions.remove(item)
-                    reactions.extend(general2spe[item])
-            if not found:
-                break
         for rea in reactions:
+            try:
+                model.reactions.get_by_id('rhea_'+str(rea)+'_c')#已经添加过了
+                continue
+            except:
+                pass
             already =0
-            reaction_add=reactionpools.reactions.get_by_id('rhea_'+str(rea)+'_c')
+            try:
+               reaction_add=reactionpools.reactions.get_by_id('rhea_'+str(rea)+'_c')
+            except:
+                print('rhea_'+str(rea)+'_c'+' does not exist in reaction pool')
+                continue
             if (reaction_add.reactants==[] or reaction_add.products==[]) and reaction_add.id not in refids:
                 print('reaction error')
                 continue
@@ -107,15 +78,15 @@ def model_reaction(name,refname):
                          reaction_add.add_metabolites({metdict[metsearch]:stoich})
                          reaction_add.add_metabolites({met:-1*stoich})
                          continue
-                     try:
-                       if (metdict[metsearch].elements['H'] - met.elements['H'] == metdict[
-                         metsearch].charge - met.charge and metdict[metsearch].elements.pop(
-                         'H') == met.elements.pop('H')) and metdict[metsearch].compartment==met.compartment:
-                         stoich = reaction_add.metabolites[met]
-                         reaction_add.add_metabolites({metdict[metsearch]: reaction_add.metabolites[stoich],
-                                                       met: -1 * reaction_add.metabolites[stoich]})
-                     except:
-                       pass
+                     # try:
+                     #   if (metdict[metsearch].elements['H'] - met.elements['H'] == metdict[
+                     #     metsearch].charge - met.charge and metdict[metsearch].elements.pop(
+                     #     'H') == met.elements.pop('H')) and metdict[metsearch].compartment==met.compartment:
+                     #     stoich = reaction_add.metabolites[met]
+                     #     reaction_add.add_metabolites({metdict[metsearch]: reaction_add.metabolites[stoich],
+                     #                                   met: -1 * reaction_add.metabolites[stoich]})
+                     # except:
+                     #   pass
                  except KeyError as e:
                      pass
             try:

@@ -15,6 +15,8 @@ rhea/*
 primate/
 data_available
 TODO/
+syns/
+data_source.tar.xz
 
 
 # 大文件类型（按需）

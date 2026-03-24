@@ -26,17 +26,11 @@ def read_gapgenes(model,genes,solution,refname,name):
             nonfindgenes.append(findrefnames.findentryname(gene.split('|')[1]))
     return model,nonfindgenes
 
-def gapfill(name,refname,grothmedium='min'):
-    if refname=='yeast':
-        refmodel = cobra.io.read_sbml_model('models/yeast-GEM.xml')
-    if refname=='ecoli':
-        refmodel=cobra.io.load_json_model('models/iML1515.json')
-    if refname=='strco':
-        refmodel=cobra.io.read_sbml_model('models/Sco-GEM.xml')
-    if refname=='human':
-        refmodel = cobra.io.read_sbml_model('models/Human-GEM.xml')
-    if refname == 'synechocystis':
-        refmodel = cobra.io.read_sbml_model('models/iSynCJ816.xml')
+def gapfill(name,refname,refmodelname,grothmedium='min',esstinal=None,use_full=True):
+    if esstinal is None:
+        esstinal=[]
+    refmodel=cobra.io.read_sbml_model(f'models/{refmodelname}')
+    # reactionpool=cobra.io.load_json_model('./models/reaction_pool_final.json')
     findrefnames.predata(refname)
     model = cobra.io.load_yaml_model(f'working/{name}/{name}-GEM_withgaps.yml')
     if refname == 'human':
@@ -69,7 +63,7 @@ def gapfill(name,refname,grothmedium='min'):
     #     if fba.fluxes.get(solution1)>=1e-10 or fba.fluxes.get(solution1)<=-1e-10:
     #         reacgaps.append(gap.model.reactions.get_by_id(solution1))
     objectbound=refmodel.optimize().objective_value
-    gapfiller = gapfilling.GapFiller(model2, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=min(objectbound*0.5,0.05))
+    gapfiller = gapfilling.GapFiller(model2, refmodel, integer_threshold=1e-09, demand_reactions=False,lower_bound=min(objectbound*0.8,0.09))
     gapfiller.model.solver.configuration.tolerances.feasibility = 1e-09
     gapfiller.model.solver.configuration.tolerances.integrality = 1e-09
     gapfiller.model.solver.configuration.tolerances.optimality = 1e-09
@@ -85,6 +79,12 @@ def gapfill(name,refname,grothmedium='min'):
                     reacgaps.append(refmodel.reactions.get_by_id(i.id))
                 except:
                     continue
+    for r in esstinal:
+        try:
+            reacgaps.append(refmodel.reactions.get_by_id(r))
+        except:
+            print('Can not find essential reaction {r}',r)
+            continue
     for reac in reacgaps:
         for genes in reac.genes:
             try:
@@ -92,7 +92,7 @@ def gapfill(name,refname,grothmedium='min'):
             except:
                 continue
     medium = refmodel.medium
-    if refname!='human' and refname!='strco' and refname!='synechocystis':
+    if refname!='human' and refname!='strco' and refname!='synechocystis' and use_full==True:
         with open(f'data_available/{refname}_full_medium.pkl', 'rb') as file:
             fullmedium = pickle.load(file)
         medium=refmodel.medium.copy()
@@ -142,7 +142,7 @@ def gapfill(name,refname,grothmedium='min'):
                 model2.add_reactions([i])
                 if model2.optimize().objective_value>1e-4:
                     gapnow.append(i)
-        print(gapnow)
+        # print(gapnow)
         for reac in gapnow:
             for genes in reac.genes:
                 try:
@@ -150,6 +150,7 @@ def gapfill(name,refname,grothmedium='min'):
                 except:
                     continue
         model2.add_reactions(gapnow)
+        print(f'Adding {len(gapnow)} genes in gapfilling')
     nonfindgenes=[]
     if len(targenes)!=0:
        SeqIO.write(targenes,fastafile,'fasta')
@@ -163,7 +164,7 @@ def gapfill(name,refname,grothmedium='min'):
            os.system(f'diamond blastp -q working/{name}/{refname}_gap.fasta -d working/{name}/{name}db --out working/{name}/outfile{name}.csv')
        model2,nonfindgenes=read_gapgenes(model=model2,genes=[x.id for x in targenes],solution=[reac.id for reac in reacgaps],refname=refname,name=name)
     model2.optimize()
-    print([reac.id for reac in reacgaps])
+    # print([reac.id for reac in reacgaps])
        # for met in model.metabolites:
        #     if met.compartment == '':
        #         model.metabolites.get_by_id(met.id).compartment = 'c'
@@ -179,6 +180,7 @@ def gapfill(name,refname,grothmedium='min'):
     #     nonfindreactions=[r.id for r in cobra.manipulation.delete.knock_out_model_genes(model2, nonfindgenes)]
     #     pd.DataFrame(nonfindreactions).to_excel(f'working/{name}/reacgaps_non_gene.xlsx')
     filter1=min(model2.optimize().objective_value,0.1)
+    num_nonreactions=[]
     for gene in nonfindgenes:
         try:
             geneid=model2.genes.get_by_id(gene)
@@ -187,37 +189,52 @@ def gapfill(name,refname,grothmedium='min'):
         with model2:
             cobra.manipulation.delete.knock_out_model_genes(model2,[geneid])
             try:
-              if model2.optimize().objective_value<=0.25*filter1:#changed
+              if model2.optimize().objective_value<=0.5*filter1:#changed
+                num_nonreactions=num_nonreactions+[r.id for r in geneid.reactions]
                 continue
             except:
+                num_nonreactions=num_nonreactions+[r.id for r in geneid.reactions]
                 continue
-        print('delete gene ',gene)
+        # print('delete gene ',gene)
         cobra.manipulation.delete.remove_genes(model2,[geneid])
     print(model2.optimize().objective_value)
     model2.compartments=refmodel.compartments
-    if refname=='ecoli':
-        cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
-        model2 = cobra.io.load_json_model(f'./working/{name}/{name}-GEM.json')
-        model2.id = f'{name}'
-        model2.name = f'{name}-GEM'
-        for i in model2.reactions:
-            keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
-            # 删除这些键
-            for k in keys_to_remove:
+    for r in esstinal:
+        try:
+            model2.add_reactions([refmodel.reactions.get_by_id(r)])
+        except:
+            print('Can not find essential reaction {r}',r)
+            continue
+    # if refname=='ecoli':
+    #     cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
+    #     model2 = cobra.io.load_json_model(f'./working/{name}/{name}-GEM.json')
+    #     model2.id = f'{name}'
+    #     model2.name = f'{name}-GEM'
+    #     for i in model2.reactions:
+    #         keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
+    #         # 删除这些键
+    #         for k in keys_to_remove:
+    #             del i.annotation[k]
+    #     cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
+    #     cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+    # else:
+    for i in model2.reactions:
+        keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
+        # 删除这些键
+        for k in keys_to_remove:
                 del i.annotation[k]
-        cobra.io.save_json_model(model2,f'./working/{name}/{name}-GEM.json')
-        cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
-    else:
-        cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
-        model2 = cobra.io.read_sbml_model(f'./working/{name}/{name}-GEM.xml')
-        model2.id = f'{name}'
-        model2.name = f'{name}-GEM'
-        for i in model2.reactions:
-            keys_to_remove = [k for k, v in i.annotation.items() if v in [[], '']]
-            # 删除这些键
-            for k in keys_to_remove:
-                del i.annotation[k]
-        cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+    cobra.io.save_json_model(model2, f'./working/{name}/{name}-GEM.json')
+    cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+    model2 = cobra.io.read_sbml_model(f'./working/{name}/{name}-GEM.xml')
+    model2.id = f'{name}'
+    model2.name = f'{name}-GEM'
+    for gene_anno in model2.genes:
+        gene_anno.annotation['uniprot']=gene_anno.id
+    cobra.io.write_sbml_model(model2, f'./working/{name}/{name}-GEM.xml')
+    cobra.io.save_json_model(model2, f'./working/{name}/{name}-GEM.json')
+
+    print(f'Number of all gapfilling reactions: {len(reacgaps)}')
+    print(f'Number of non-bio genes: {len(set([r.id for r in reacgaps])&set(num_nonreactions))}')
 
 
 

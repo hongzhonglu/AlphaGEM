@@ -1,23 +1,30 @@
 import pandas as pd
+
 def homo(name):
     gx1 = pd.read_excel(f'working/{name}/matrix_homo_part1{name}.xlsx')
     gx4 = pd.read_excel(f'working/{name}/matrix_homo_part2{name}.xlsx')
-    gx3 = pd.DataFrame()
+    
+    # 使用 set 追踪已添加的 (gene, homolog) 配对
+    pairs = set()
+    rows = []
+    
+    # 从 gx1 提取同源对
     for i in range(len(gx1.index)):
-        gx3 = pd.concat([gx3, pd.DataFrame({
-            0: [gx1.iat[i, 1]],
-            1: [gx1.iat[i, 2]]
-        })])
+        gene = gx1.iat[i, 1]
+        homolog = gx1.iat[i, 2]
+        pair = (gene, homolog)
+        if pair not in pairs:
+            pairs.add(pair)
+            rows.append({0: gene, 1: homolog})
+    
+    # 从 gx4 添加不重复的同源对
     for i in range(len(gx4.index)):
-        try:
-            a=gx3[0]
-            if gx3.iat[list(a).index(gx4.iat[i,1]),1]==gx4.iat[i,2]:
-                continue
-        except:
-            a=0
-        gx3 = pd.concat([gx3, pd.DataFrame({
-            0: [gx4.iat[i, 1]],
-            1: [gx4.iat[i, 2]]
-        })])
-    gx3.index = range(len(gx3.index))
-    gx3.to_excel(f'working/{name}/matrix_homolog{name}_preforprottrans.xlsx')
+        gene = gx4.iat[i, 1]
+        homolog = gx4.iat[i, 2]
+        pair = (gene, homolog)
+        if pair not in pairs:
+            pairs.add(pair)
+            rows.append({0: gene, 1: homolog})
+    
+    gx3 = pd.DataFrame(rows)
+    gx3.to_excel(f'working/{name}/matrix_homolog{name}_preforprottrans.xlsx', index=False)

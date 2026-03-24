@@ -1,4 +1,5 @@
 from Bio import SeqIO
+from Bio.Seq import Seq
 
 
 def rename_genes_in_fasta(input_fasta, output_fasta):
@@ -15,7 +16,7 @@ def rename_genes_in_fasta(input_fasta, output_fasta):
             record.id='sp|'+record.id+'|'+record.id
         record.name=''
         record.description=''
-        record.seq=str(record.seq).replace('*','')
+        record.seq=Seq(str(record.seq).replace('*',''))
         records.append(record)
     with open(output_fasta, "w") as output_handle:
         SeqIO.write(records, output_handle, "fasta")

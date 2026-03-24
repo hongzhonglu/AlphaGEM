@@ -808,7 +808,7 @@ if __name__ == "__main__":
         
         # 1. 完整注释（含 name/xrefs/ec/raw_xrefs）
         with open(f"{out_dir}/mnxref_reac_ann.pkl", "wb") as f:
-        pickle.dump(ann, f, protocol=pickle.HIGHEST_PROTOCOL)
+           pickle.dump(ann, f, protocol=pickle.HIGHEST_PROTOCOL)
         print(f"\n✓ 已保存注释到 {out_dir}/mnxref_reac_ann.pkl")
         
         # 2. 计量学信息
@@ -818,11 +818,11 @@ if __name__ == "__main__":
         
         # 3. 仅 xrefs（向后兼容）
         with open(f"{out_dir}/mnxref_reac_xrefs.pkl", "wb") as f:
-        pickle.dump({k: v.get("xrefs", {}) for k, v in ann.items()}, f, protocol=pickle.HIGHEST_PROTOCOL)
+           pickle.dump({k: v.get("xrefs", {}) for k, v in ann.items()}, f, protocol=pickle.HIGHEST_PROTOCOL)
         
         # 4. 原始 xref 三元组（可选）
         with open(f"{out_dir}/mnxref_reac_raw_xrefs.pkl", "wb") as f:
-        pickle.dump({k: v.get("raw_xrefs", []) for k, v in ann.items()}, f, protocol=pickle.HIGHEST_PROTOCOL)
+           pickle.dump({k: v.get("raw_xrefs", []) for k, v in ann.items()}, f, protocol=pickle.HIGHEST_PROTOCOL)
 
         # 5. 输出缺失注释信息的 MNXR 到 CSV
         if missing:

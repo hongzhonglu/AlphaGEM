@@ -38,11 +38,11 @@ def modelbuild(refmodel,name,mincomp=0.8):
     tarname = name
     tarmod = cobra.io.load_yaml_model(f'working/{name}/model1{name}.yml')
     print('imported target model')
-    if refmodel=='yeast-GEM.xml' or refmodel=='Sco-GEM.xml' or refmodel=='Human-GEM.xml' or refmodel=='iSynCJ816.xml':
-      ymod = cobra.io.read_sbml_model(f'models/{refmodel}')
-    if refmodel=='iML1515.json':
-        ymod=cobra.io.load_json_model(f'models/{refmodel}')
-    tarmodel = cobra.Model('Target_model')
+    # if refmodel=='yeast-GEM.xml' or refmodel=='Sco-GEM.xml' or refmodel=='Human-GEM.xml' or refmodel=='iSynCJ816.xml' or refmodel=='universal-GEM.xml':
+    ymod = cobra.io.read_sbml_model(f'models/{refmodel}')
+    # if refmodel=='iML1515.json':
+    #     ymod=cobra.io.load_json_model(f'models/{refmodel}')
+    tarmodel = cobra.Model(f'{name}-GEM')
     homos = pd.read_excel(f'working/{name}/matrix_homolog{name}.xlsx')
     addedreactions=[reaction.id for reaction in tarmod.reactions]
     leftreactions=[]
@@ -56,7 +56,7 @@ def modelbuild(refmodel,name,mincomp=0.8):
     homodict={}
     for groups in homos.groupby('refmodelgene'):
         try:
-            homodict[groups[0]]=list(groups[1]['tarmodelgene'])#changed
+            homodict[groups[0]]=list(groups[1]['tarmodelgene'])#can change it to choose the best one to confirm the length of gpr
         except KeyError:
             homodict[groups[0]] = list(groups[1]['tarmodelgene'])
     #add othergenes
@@ -68,7 +68,7 @@ def modelbuild(refmodel,name,mincomp=0.8):
     for key,gpr in tqdm(complexdict.items(),'adding complex'):
         complextruedict[key]=[]
         for gprs in gpr:
-            if gprs.split(' and ').count('None')<=(1-mincomp)*len(gprs.split(' and ')):
+            if gprs.split(' and ').count('None')<=(1-mincomp)*len(gprs.split(' and '))+1e-5:
                 complextruedict[key].append('('+' and '.join([x for x in gprs.split(' and ') if x != 'None'])+')')
         if complextruedict[key]==[]:
             complextruedict.pop(key)
@@ -82,6 +82,7 @@ def modelbuild(refmodel,name,mincomp=0.8):
         else:
             rxn1.gene_reaction_rule=complextruedict[key][0][1:-1]
         toaddreactions.append(rxn1)
+    print(toaddreactions)
     print(f'added complexes {len(toaddreactions)}')
     tarmodel.add_reactions(toaddreactions)
     tarmodel.objective=ymod.objective

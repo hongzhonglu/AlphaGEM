@@ -14,7 +14,7 @@ def calculate_score(row):
         score+=0.2
     if pd.notnull(row['anno_D']):
         score+=0.1
-    return score
+    return round(score, 1)
 
 
 def findtargetreaction(g, ec):
@@ -118,7 +118,4 @@ def nonhome(name,clean_use,deepec_use,plm_use=True,ecgraph=False):
     plmrhea.rename(columns={'reaction_D': 'reaction','rhea_D':'rhea'}, inplace=True)
     merged=pd.merge(merged, plmrhea, how='outer', on=['reaction', 'rhea'])
     merged['final_score'] = merged.apply(calculate_score, axis=1)
-    resultec = merged[merged['final_score'] >= filter_num].reset_index(drop=True)
     merged.to_excel(f'working/{name}/{name}multiple_score.xlsx', index=False)
-    result = resultec.groupby('rhea')['reaction'].apply(lambda x: ' or '.join(x)).reset_index()
-    result.to_excel(f'working/{name}/{name}gpr_score.xlsx')
