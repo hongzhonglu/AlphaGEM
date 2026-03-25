@@ -1,5 +1,8 @@
 import sys
 import warnings
+
+import pandas as pd
+
 warnings.filterwarnings("ignore")
 sys.path.append('./src')
 sys.path.append('./plmsearchtools/plmsearch/plmsearch_util')
@@ -28,6 +31,7 @@ import use_clean
 import use_eggnog
 import use_rhea
 import multiple_annotition_for_nonhomogene
+import general_reactions_to_spe
 import gapfilling
 import use_deepectransformer
 import add_reactions_based_pool
@@ -49,6 +53,7 @@ def main():
     parser.add_argument('--maplist', type=str,default='', help='mapping list of structures and genes names')
     parser.add_argument('--structure', type=str,default='', help='files you store structures')
     parser.add_argument('--cleanuse', type=bool, help='whether you have used CLEAN')
+    parser.add_argument('--USalignfilter',type=float,help='US alignment filter',default=0.5)
     parser.add_argument('--TMscore', type=float,default=0.7,help='filter TMscore')
     parser.add_argument('--upTMscore', type=float, default=0.9, help='safe TMscore')
     parser.add_argument('--TMscoretrans', type=float,default=0.7, help='filter TMscoretrans')
@@ -56,8 +61,10 @@ def main():
     parser.add_argument('--upcoverage', type=float, default=0.9, help='safe coverage')
     parser.add_argument('--coveragetrans',type=float,default=0.8, help='filter coveragetrans')
     parser.add_argument('--pLDDT', type=float,default=70, help='filter pLDDT')
-    parser.add_argument('--esp', type=float, default=1, help='cluster esp')
+    parser.add_argument('--esp', type=float, default=0.8, help='cluster esp')
+    parser.add_argument('--prottrans_distance', type=float, default=1.2, help='prottrans-distance')
     parser.add_argument('--grothmedium',type=str,default='min', help='grothmedium',choices=['min','full'])
+    parser.add_argument('--essentialrxns', type=str, help='essential genes for gapfilling, an excel file')
     args = parser.parse_args()
     mode=args.mode
     fasta=args.fasta
@@ -72,6 +79,7 @@ def main():
     name=args.name
     listfile=args.maplist
     structurefile=args.structure
+    USalignfilter=args.USalignfilter
     TMscore = args.TMscore
     TMscoretrans=args.TMscoretrans
     upTMscore=args.upTMscore
@@ -81,9 +89,14 @@ def main():
     upcoverage=args.upcoverage
     pLDDT=args.pLDDT
     spe=args.esp
+    distance=args.prottrans_distance
     grothmedium=args.grothmedium
+    if args.essentialrxns:
+        essential=[i for i in pd.read_excel(args.essentialrxns)['reaction_id']]
+    else:
+        essential=None
     if refname == 'ecoli':
-        refmodel = 'iML1515.json'
+        refmodel = 'ecoli-GEM.xml'
     if refname == 'yeast':
         refmodel = 'yeast-GEM.xml'
     if refname == 'strco':
@@ -92,6 +105,8 @@ def main():
         refmodel = 'Human-GEM.xml'
     if refname == 'synechocystis':
         refmodel = 'iSynCJ816.xml'
+    if refname == 'universal':
+        refmodel = 'universal-GEM.xml'
     try:
         os.mkdir(f'./working/{name}')
     except FileExistsError:
@@ -100,17 +115,17 @@ def main():
     if not os.path.isfile(f'./working/{name}/{name}_embedding.pkl'):
         plmsearch_embedding.embedding_generate(name)
     if mode=='structure_alignment':
-        generate_list.generare_list_with_structure(name,listfile,structurefile)
-        orthofinder_datahandle.datahandel(name,refname)
-        US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
-        US_align_choose.US_align_choose(name)
-        foldseek_knock1.foldseekfind(path_taryeast_structure, name, refname)
-        foldseek_choose.foldseek_choose(name, refname, path_taryeast_structure)
-        foldseek_choose2.foldseek_choose2(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDT)
-        foldseekcluster.cluster(name,spe,uptm=upTMscore,upcov=upcoverage)
-        homolog_concat2.homo(name)
-        filter_by_prottrans.filter_by_prottrans(name,refname)
-        a=1
+        # generate_list.generare_list_with_structure(name,listfile,structurefile)
+        # orthofinder_datahandle.datahandel(name,refname)
+        # US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
+        # US_align_choose.US_align_choose(name,USalignfilter)
+        # foldseek_knock1.foldseekfind(path_taryeast_structure, name, refname)
+        # foldseek_choose.foldseek_choose(name, refname, path_taryeast_structure)
+        # foldseek_choose2.foldseek_choose2(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDT)
+        # foldseekcluster.cluster(name,spe,uptm=upTMscore,upcov=upcoverage)
+        # homolog_concat2.homo(name)
+        # filter_by_prottrans.filter_by_prottrans(name,refname,distance)
+        pass
     if mode=='plmsearch':
         threshold = 0.95
         cov_thre = 0.8#双向blast阈值
@@ -126,19 +141,20 @@ def main():
         cov_filter.bbh(name, refname, threshold, cov_thre, pid_thre, direction)
         cov_filter.merge(name, refname, threshold, cov_threshold, id_threshold, cov_thre, pid_thre, direction)
         mkdir.mvfile(name, refname, threshold, cov_threshold, id_threshold, cov_thre, pid_thre, direction)
-    model_build1.modelbuild(refmodel,name)
-    model_build2.modelbuild(refmodel, name)
-    use_eggnog.eggnog(name,refname, 1)
-    use_clean.clean_result(name)
-    use_deepectransformer.use_deepectransformer(name)
-    use_rhea.rhea(name,refname)
-    multiple_annotition_for_nonhomogene.nonhome(name,True,True)
-    add_reactions_based_pool.model_reaction(name,refname)
-    gapfilling.gapfill(name, refname,grothmedium)
+
+
+    # use_eggnog.eggnog(name,refname, 1)
+    # use_clean.clean_result(name)
+    # use_deepectransformer.use_deepectransformer(name)
+    # use_rhea.rhea(name,refname)
+    # multiple_annotition_for_nonhomogene.nonhome(name,True,True)
+    # general_reactions_to_spe.get_spe_reactions(name)
+    # add_reactions_based_pool.model_reaction(name,refmodel)
+    gapfilling.gapfill(name, refname,refmodel,grothmedium,essential)
 
 
 if __name__=='__main__':
     main()
-t2=time.time()
-print('AlphaGEM costs ',str(t2-t1),' seconds')
+    t2=time.time()
+    print('AlphaGEM costs ',str(t2-t1),' seconds')
 

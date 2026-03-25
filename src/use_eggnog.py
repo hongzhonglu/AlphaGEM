@@ -25,7 +25,7 @@ def eggnog(name,refname,i=1):
         os.system('tools/eggnog_mapper/create_dbs.py -m diamond --dbname yeast --taxa Saccharomycetes')
     if refname=='yeast':
         os.system(
-        f'python {path}/tools/eggnog_mapper/emapper.py -m diamond -i {path}/working/{name}/{name}.fasta -o {path}/working/{name}/test{name} --tax_scope Saccharomycetes --cpu 0 --dmnd_db {path}/tools/eggnog_mapper/data/yeast.dmnd --temp_dir {path}/temp/{name} --override')
+        f'python {path}/tools/eggnog_mapper/emapper.py -m diamond -i {path}/working/{name}/{name}.fasta -o {path}/working/{name}/test{name} --tax_scope Fungi --cpu 0 --dmnd_db {path}/tools/eggnog_mapper/data/fungi.dmnd --temp_dir {path}/temp/{name} --override')
     if refname=='ecoli':
         os.system(f'python {path}/tools/eggnog_mapper/emapper.py -m diamond -i {path}/working/{name}/{name}.fasta -o {path}/working/{name}/test{name} --tax_scope Bacteria --cpu 0 --dmnd_db {path}/tools/eggnog_mapper/data/bacteria.dmnd --temp_dir {path}/temp/{name} --override')
     if refname=='strco':

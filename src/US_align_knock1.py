@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 import os
 from plddt_find import get_plddt_from_pdb as gpl
 from functools import partial
@@ -8,6 +9,8 @@ import subprocess
 
 
 def worker(i, gx, yeadict, name, refname, path):
+    if gx.iat[i, 1]=='b448':
+        print(duiying1(gx.iat[i, 1], yeadict))
     return tdblast(duiying1(gx.iat[i, 1], yeadict), gx.iat[i, 2], i, name, refname, path)
 
 
@@ -33,16 +36,32 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
     pdd=pd.DataFrame({1:[0],2:[0],3:[0],4:[0],5:[0],6:[0]})
     if cmd1==0 or cmd2==0:
         return pdd
-    cmd = f"{pathwd}/tools/USalign/USalign {path}/AF-{cmd2}-F1-model_v4.pdb {pathwd}/struct_data/{refname}/AF-{cmd1}-F1-model_v4.pdb"
-    res = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output = res.stdout.readlines()
+
+    usalign_exec = os.path.join(pathwd, "tools/USalign/USalign")
+    input_file_1 = os.path.join(path, f"AF-{cmd2}-F1-model_v4.pdb")
+    input_file_2 = os.path.join(pathwd, f"struct_data/{refname}/AF-{cmd1}-F1-model_v4.pdb")
+
+    cmd = [usalign_exec, input_file_1, input_file_2]
     try:
-        d = float(output[15][10:17])
-        e = float(output[16][10:17])
-    except Exception as ex:
-        print(f"Error occurred: {ex}")
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        output = res.stdout
+        tm_scores = re.findall(r"TM-score=\s*([\d\.]+)", output)
+        if len(tm_scores) >= 2:
+            d = float(tm_scores[0])  # 对应原来的 output[15]
+            e = float(tm_scores[1])  # 对应原来的 output[16]
+        else:
+            # print("Warning: Could not find enough TM-scores in output.")
+            d = e = ''
+
+    except subprocess.CalledProcessError as e:
+        print(f"Command execution failed: {e.stderr}")
         d = e = ''
-    print('done', cmd1, cmd2)
+    except Exception as ex:
+        print(f"Parsing error occurred: {ex}")
+        d = e = ''
+
+    # print(f"Score 1: {d}, Score 2: {e}")
+    # print('USalign done', cmd1, cmd2)
     if d!='':
             f=gpl(
             f'{path}/AF-{cmd2}-F1-model_v4.pdb')

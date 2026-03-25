@@ -41940,7 +41940,7 @@
           <fbc:geneProductRef fbc:geneProduct="G_SCO5773"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_3HXACOADH" sboTerm="SBO:0000176" id="R_3HXACOADH" name="3-hydroxyacyl-CoA dehydrogenase" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_3HXACOADH" sboTerm="SBO:0000176" id="R_3HXACOADH" name="3-hydroxyacyl-CoA dehydrogenase" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <notes>
           <html xmlns="http://www.w3.org/1999/xhtml">
             <p>CONFIDENCE LEVEL: 2</p>
@@ -47772,7 +47772,7 @@
           <fbc:geneProductRef fbc:geneProduct="G_SCO4881"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_30731_c" sboTerm="SBO:0000176" id="R_rhea_30731_c" name="acyl-CoA dehydrogenase (butanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_30731_c" sboTerm="SBO:0000176" id="R_rhea_30731_c" name="acyl-CoA dehydrogenase (butanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_30731_c">
@@ -47807,7 +47807,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_43464_c" sboTerm="SBO:0000176" id="R_rhea_43464_c" name="acyl-CoA dehydrogenase (hexanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_43464_c" sboTerm="SBO:0000176" id="R_rhea_43464_c" name="acyl-CoA dehydrogenase (hexanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_43464_c">
@@ -47843,7 +47843,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_48180_c" sboTerm="SBO:0000176" id="R_rhea_48180_c" name="acyl-CoA dehydrogenase (octanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_48180_c" sboTerm="SBO:0000176" id="R_rhea_48180_c" name="acyl-CoA dehydrogenase (octanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_48180_c">
@@ -47878,7 +47878,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_48176_c" sboTerm="SBO:0000176" id="R_rhea_48176_c" name="acyl-CoA dehydrogenase (decanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_48176_c" sboTerm="SBO:0000176" id="R_rhea_48176_c" name="acyl-CoA dehydrogenase (decanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_48176_c">
@@ -47914,7 +47914,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_47296_c" sboTerm="SBO:0000176" id="R_rhea_47296_c" name="acyl-CoA dehydrogenase (dodecanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_47296_c" sboTerm="SBO:0000176" id="R_rhea_47296_c" name="acyl-CoA dehydrogenase (dodecanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_47296_c">
@@ -47949,7 +47949,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_47316_c" sboTerm="SBO:0000176" id="R_rhea_47316_c" name="acyl-CoA dehydrogenase (tetradecanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_47316_c" sboTerm="SBO:0000176" id="R_rhea_47316_c" name="acyl-CoA dehydrogenase (tetradecanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_47316_c">
@@ -47984,7 +47984,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_43448_c" sboTerm="SBO:0000176" id="R_rhea_43448_c" name="acyl-CoA dehydrogenase (hexadecanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_43448_c" sboTerm="SBO:0000176" id="R_rhea_43448_c" name="acyl-CoA dehydrogenase (hexadecanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_43448_c">
@@ -48052,7 +48052,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_ACOAD9" sboTerm="SBO:0000176" id="R_ACOAD9" name="acyl-CoA dehydrogenase (Isobutiryl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_ACOAD9" sboTerm="SBO:0000176" id="R_ACOAD9" name="acyl-CoA dehydrogenase (Isobutiryl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_ACOAD9">
@@ -48081,7 +48081,7 @@
           <fbc:geneProductRef fbc:geneProduct="G_SCO2779"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_ACOADH1" sboTerm="SBO:0000176" id="R_ACOADH1" name="acyl-CoA dehydrogenase (2-Methyl-butanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_ACOADH1" sboTerm="SBO:0000176" id="R_ACOADH1" name="acyl-CoA dehydrogenase (2-Methyl-butanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_ACOADH1">
@@ -49633,7 +49633,7 @@
           <fbc:geneProductRef fbc:geneProduct="G_SCO5091"/>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_ACTS13" sboTerm="SBO:0000176" id="R_ACTS13" name="hydroxylacyl-CoA dehydrogenase" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_ACTS13" sboTerm="SBO:0000176" id="R_ACTS13" name="hydroxylacyl-CoA dehydrogenase" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_ACTS13">
@@ -57819,7 +57819,7 @@
           <speciesReference species="M_chebi30776_c" stoichiometry="1" constant="true"/>
         </listOfProducts>
       </reaction>
-      <reaction metaid="meta_R_CDAS11" sboTerm="SBO:0000176" id="R_CDAS11" name="acyl-CoA dehydrogenase (hexanoyl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_CDAS11" sboTerm="SBO:0000176" id="R_CDAS11" name="acyl-CoA dehydrogenase (hexanoyl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_CDAS11">
@@ -82462,7 +82462,7 @@
           </fbc:or>
         </fbc:geneProductAssociation>
       </reaction>
-      <reaction metaid="meta_R_rhea_31063_c" sboTerm="SBO:0000176" id="R_rhea_31063_c" name="acyl-CoA dehydrogenase (Isovaleryl-CoA)" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+      <reaction metaid="meta_R_rhea_31063_c" sboTerm="SBO:0000176" id="R_rhea_31063_c" name="acyl-CoA dehydrogenase (Isovaleryl-CoA)" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#meta_R_rhea_31063_c">
@@ -230536,65 +230536,65 @@
     <groups:listOfGroups>
       <groups:group groups:id="G_Methionine__32__and__32__Cysteine__32__Metabolism" groups:name="Methionine and Cysteine Metabolism" groups:kind="collection">
         <groups:listOfMembers>
-          <groups:member groups:name="N-acetylcysteine synthase (putative acyl-transferase)" groups:idRef="R_ACCS"/>
           <groups:member groups:name="N-acetylcysteine transport" groups:idRef="R_ACCt"/>
+          <groups:member groups:name="N-acetylcysteine synthase (putative acyl-transferase)" groups:idRef="R_ACCS"/>
         </groups:listOfMembers>
       </groups:group>
       <groups:group groups:id="G_Cofactor__32__and__32__Prosthetic__32__Group__32__Biosynthesis" groups:name="Cofactor and Prosthetic Group Biosynthesis" groups:kind="collection">
         <groups:listOfMembers>
-          <groups:member groups:name="acyl-carrier protein synthase (cpk)" groups:idRef="R_ACPScpk"/>
           <groups:member groups:name="acyl-carrier-protein phosphodiesterase (cpk)" groups:idRef="R_ACPSpdscpk"/>
+          <groups:member groups:name="acyl-carrier protein synthase (cpk)" groups:idRef="R_ACPScpk"/>
         </groups:listOfMembers>
       </groups:group>
       <groups:group groups:id="G_Quinol__32__and__32__Quinone__32__Biosynthesis" groups:name="Quinol and Quinone Biosynthesis" groups:kind="collection">
         <groups:listOfMembers>
-          <groups:member groups:name="Dehypoxanthine futalosine:S-adenosyl-L-methionine oxidoreductase" groups:idRef="R_DXFUTOR"/>
           <groups:member groups:name="Aminodeoxyfutalosine nucleosidase" groups:idRef="R_ADXFUTNS"/>
+          <groups:member groups:name="Dehypoxanthine futalosine:S-adenosyl-L-methionine oxidoreductase" groups:idRef="R_DXFUTOR"/>
         </groups:listOfMembers>
       </groups:group>
       <groups:group groups:id="G_Coelimycin__32__Biosynthesis" groups:name="Coelimycin Biosynthesis" groups:kind="collection">
         <groups:listOfMembers>
-          <groups:member groups:name="CpkC polyketide elongation 2 and thioester reductase" groups:idRef="R_CPKS3"/>
-          <groups:member groups:name="CpkG transaminase (with L-Ala)" groups:idRef="R_CPKS4a"/>
-          <groups:member groups:name="Flavin dependent epoxidases/dehydrogenases" groups:idRef="R_CPKS5"/>
-          <groups:member groups:name="Putative transmembrane efflux protein CpkF" groups:idRef="R_CPKSt"/>
           <groups:member groups:name="CpkG transaminase (with L-Glu)" groups:idRef="R_CPKS4b"/>
           <groups:member groups:name="CpkA initiation" groups:idRef="R_CPKS1"/>
-          <groups:member groups:name="CpkB polyketide elongation 1" groups:idRef="R_CPKS2"/>
+          <groups:member groups:name="Putative transmembrane efflux protein CpkF" groups:idRef="R_CPKSt"/>
           <groups:member groups:name="Extracellular spontaneous reaction" groups:idRef="R_CPKS6"/>
+          <groups:member groups:name="CpkG transaminase (with L-Ala)" groups:idRef="R_CPKS4a"/>
+          <groups:member groups:name="Flavin dependent epoxidases/dehydrogenases" groups:idRef="R_CPKS5"/>
+          <groups:member groups:name="CpkB polyketide elongation 1" groups:idRef="R_CPKS2"/>
+          <groups:member groups:name="CpkC polyketide elongation 2 and thioester reductase" groups:idRef="R_CPKS3"/>
         </groups:listOfMembers>
       </groups:group>
       <groups:group groups:id="G_Oxidative__32__Phosphorylation" groups:name="Oxidative Phosphorylation" groups:kind="collection">
         <groups:listOfMembers>
-          <groups:member groups:name="fumarate reductase(2-demthylmenaquinone-9)" groups:idRef="R_FRD3"/>
-          <groups:member groups:name="Glycolate oxidase" groups:idRef="R_GLYCTO4"/>
-          <groups:member groups:name="NADPH Quinone reductase" groups:idRef="R_NADPHQR4"/>
           <groups:member groups:name="NADH dehydrogenase (demethylmenaquinone-9; 3 protons)" groups:idRef="R_NADH8"/>
-          <groups:member groups:name="NADH dehydrogenase(demethylmenaquinone-9; 0 protons)" groups:idRef="R_NADH9"/>
           <groups:member groups:name="glycerol-3-phosphate 9demethylmenaquinone-9)" groups:idRef="R_G3PD7"/>
+          <groups:member groups:name="NADPH Quinone reductase" groups:idRef="R_NADPHQR4"/>
+          <groups:member groups:name="Glycolate oxidase" groups:idRef="R_GLYCTO4"/>
+          <groups:member groups:name="NADH dehydrogenase(demethylmenaquinone-9; 0 protons)" groups:idRef="R_NADH9"/>
+          <groups:member groups:name="fumarate reductase(2-demthylmenaquinone-9)" groups:idRef="R_FRD3"/>
         </groups:listOfMembers>
       </groups:group>
       <groups:group groups:id="G_Butyrolactones__32__Biosynthesis" groups:name="Butyrolactones Biosynthesis" groups:kind="collection">
         <groups:listOfMembers>
-          <groups:member groups:name="Aldol condensation SCB2 precursor (infered as spontaneous)" groups:idRef="R_SCB22"/>
-          <groups:member groups:name="Acyl-transferase (using beta keto-acyl ACP precursor)" groups:idRef="R_SCB31"/>
-          <groups:member groups:name="SCB3 transport (diffusible molecule)" groups:idRef="R_SCB3t"/>
-          <groups:member groups:name="Acyl-transferase (using beta keto-acyl ACP precursor)" groups:idRef="R_SCB11"/>
-          <groups:member groups:name="Beta-keto-acid-CoA/ACP reductase" groups:idRef="R_SCB35"/>
-          <groups:member groups:name="Acyl-transferase (using beta keto-acyl ACP precursor)" groups:idRef="R_SCB21b"/>
-          <groups:member groups:name="Beta-keto-acid-CoA/ACP reductase" groups:idRef="R_SCB15"/>
-          <groups:member groups:name="Butenolide phosphatase reductase (SCB2 precursor)" groups:idRef="R_SCB23"/>
-          <groups:member groups:name="SCB2 precursor phosphatase" groups:idRef="R_SCB24"/>
-          <groups:member groups:name="Aldol condensation SCB3 precursor (infered as spontaneous)" groups:idRef="R_SCB32"/>
-          <groups:member groups:name="SCB2 transport (diffusible molecule)" groups:idRef="R_SCB2t"/>
           <groups:member groups:name="Aldol condensation SCB1 precursor (infered as spontaneous)" groups:idRef="R_SCB12"/>
+          <groups:member groups:name="SCB3 transport (diffusible molecule)" groups:idRef="R_SCB3t"/>
+          <groups:member groups:name="SCB2 transport (diffusible molecule)" groups:idRef="R_SCB2t"/>
+          <groups:member groups:name="Beta-keto-acid-CoA/ACP reductase" groups:idRef="R_SCB15"/>
+          <groups:member groups:name="Acyl-transferase (using beta keto-acyl ACP precursor)" groups:idRef="R_SCB31"/>
+          <groups:member groups:name="SCB1 precursor phosphatase" groups:idRef="R_SCB14"/>
+          <groups:member groups:name="Butenolide phosphatase reductase (SCB2 precursor)" groups:idRef="R_SCB23"/>
+          <groups:member groups:name="Butenolide phosphatase reductase (SCB3 precursor)" groups:idRef="R_SCB33"/>
+          <groups:member groups:name="Acyl-transferase (using beta keto-acyl ACP precursor)" groups:idRef="R_SCB21b"/>
+          <groups:member groups:name="Acyl-transferase (using beta keto-acyl ACP precursor)" groups:idRef="R_SCB11"/>
+          <groups:member groups:name="SCB2 precursor phosphatase" groups:idRef="R_SCB24"/>
           <groups:member groups:name="Acyl-transferase (using beta keto-acyl CoA precursor)" groups:idRef="R_SCB21a"/>
           <groups:member groups:name="SCB1 transport (diffusible molecule)" groups:idRef="R_SCB1t"/>
-          <groups:member groups:name="Butenolide phosphatase reductase (SCB3 precursor)" groups:idRef="R_SCB33"/>
-          <groups:member groups:name="Butenolide phosphatase reductase (SCB1 precursor)" groups:idRef="R_SCB13"/>
-          <groups:member groups:name="SCB1 precursor phosphatase" groups:idRef="R_SCB14"/>
+          <groups:member groups:name="Beta-keto-acid-CoA/ACP reductase" groups:idRef="R_SCB35"/>
           <groups:member groups:name="Beta-keto-acid-CoA/ACP reductase" groups:idRef="R_SCB25"/>
+          <groups:member groups:name="Aldol condensation SCB3 precursor (infered as spontaneous)" groups:idRef="R_SCB32"/>
+          <groups:member groups:name="Butenolide phosphatase reductase (SCB1 precursor)" groups:idRef="R_SCB13"/>
           <groups:member groups:name="SCB3 precursor phosphatase" groups:idRef="R_SCB34"/>
+          <groups:member groups:name="Aldol condensation SCB2 precursor (infered as spontaneous)" groups:idRef="R_SCB22"/>
         </groups:listOfMembers>
       </groups:group>
       <groups:group groups:id="G_Polysaccharides__32__degradation" groups:name="Polysaccharides degradation" groups:kind="collection">
