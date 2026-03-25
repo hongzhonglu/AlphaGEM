@@ -115,16 +115,16 @@ def main():
     if not os.path.isfile(f'./working/{name}/{name}_embedding.pkl'):
         plmsearch_embedding.embedding_generate(name)
     if mode=='structure_alignment':
-        # generate_list.generare_list_with_structure(name,listfile,structurefile)
-        # orthofinder_datahandle.datahandel(name,refname)
-        # US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
-        # US_align_choose.US_align_choose(name,USalignfilter)
-        # foldseek_knock1.foldseekfind(path_taryeast_structure, name, refname)
-        # foldseek_choose.foldseek_choose(name, refname, path_taryeast_structure)
-        # foldseek_choose2.foldseek_choose2(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDT)
-        # foldseekcluster.cluster(name,spe,uptm=upTMscore,upcov=upcoverage)
-        # homolog_concat2.homo(name)
-        # filter_by_prottrans.filter_by_prottrans(name,refname,distance)
+        generate_list.generare_list_with_structure(name,listfile,structurefile)
+        orthofinder_datahandle.datahandel(name,refname)
+        US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
+        US_align_choose.US_align_choose(name,USalignfilter)
+        foldseek_knock1.foldseekfind(path_taryeast_structure, name, refname)
+        foldseek_choose.foldseek_choose(name, refname, path_taryeast_structure)
+        foldseek_choose2.foldseek_choose2(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDT)
+        foldseekcluster.cluster(name,spe,uptm=upTMscore,upcov=upcoverage)
+        homolog_concat2.homo(name)
+        filter_by_prottrans.filter_by_prottrans(name,refname,distance)
         pass
     if mode=='plmsearch':
         threshold = 0.95
@@ -143,13 +143,13 @@ def main():
         mkdir.mvfile(name, refname, threshold, cov_threshold, id_threshold, cov_thre, pid_thre, direction)
 
 
-    # use_eggnog.eggnog(name,refname, 1)
-    # use_clean.clean_result(name)
-    # use_deepectransformer.use_deepectransformer(name)
-    # use_rhea.rhea(name,refname)
-    # multiple_annotition_for_nonhomogene.nonhome(name,True,True)
-    # general_reactions_to_spe.get_spe_reactions(name)
-    # add_reactions_based_pool.model_reaction(name,refmodel)
+    use_eggnog.eggnog(name,refname, 1)
+    use_clean.clean_result(name)
+    use_deepectransformer.use_deepectransformer(name)
+    use_rhea.rhea(name,refname)
+    multiple_annotition_for_nonhomogene.nonhome(name,True,True)
+    general_reactions_to_spe.get_spe_reactions(name)
+    add_reactions_based_pool.model_reaction(name,refmodel)
     gapfilling.gapfill(name, refname,refmodel,grothmedium,essential)
 
 
