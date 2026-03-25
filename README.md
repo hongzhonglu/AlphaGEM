@@ -79,12 +79,13 @@ Usage:
   - **--list**: Path to a list file of structures and gene names. Default: empty
   - **--structure**: Directory containing structure files. Default: empty
   - **--cleanuse**: Whether CLEAN has been used. To enable, pass `--cleanuse True`; to disable, omit the flag
-  - **--TMscore**: Structure alignment filter threshold. Default: 0.7
-  - **--upTMscore**: Safe TMscore. Default: 0.9
-  - **--TMscoretrans**: Transporter TMscore filter. Default: 0.7
-  - **--coverage**: Coverage filter threshold. Default: 0.8
-  - **--upcoverage**: Safe coverage. Default: 0.9
-  - **--coveragetrans**: Transporter coverage filter. Default: 0.8
+  - **--USalignfilter**: USalign filter threshold. Default: 0.5
+  - **--TMscore**: Structure alignment filter threshold(foldseek). Default: 0.7
+  - **--upTMscore**: Safe TMscore(foldseek). Default: 0.9
+  - **--TMscoretrans**: Transporter TMscore filter (foldseek). Default: 0.7
+  - **--coverage**: Coverage filter threshold(foldseek). Default: 0.8
+  - **--upcoverage**: Safe coverage(foldseek). Default: 0.9
+  - **--coveragetrans**: Transporter coverage filter(foldseek). Default: 0.8
   - **--pLDDT**: pLDDT filter threshold. Default: 70
   - **--esp**: Clustering parameter. Default: 1
   - **--grothmedium**: Growth medium. Default: `min`; choices: `min`, `full`
