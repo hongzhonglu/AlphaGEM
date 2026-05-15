@@ -45,7 +45,7 @@ def filter_plmsearch(merged,general2spe,filter_num,done=True):
 
 def get_spe_reactions(name,filter_num=0.4):
     merged=pd.read_excel(f'working/{name}/{name}multiple_score.xlsx').drop_duplicates()
-    pklopen = open('data_available/general2specific2.pkl', 'rb')
+    pklopen = open('data_available/general2specific.pkl', 'rb')
     general2spe = pickle.load(pklopen)
     resultec=filter_plmsearch(merged,general2spe,filter_num,done=True)
     result = resultec.groupby('rhea')['reaction'].apply(lambda x: ' or '.join(x)).reset_index()

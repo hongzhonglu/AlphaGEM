@@ -15,7 +15,11 @@ def homo(name):
         pair = (gene, homolog)
         if pair not in pairs:
             pairs.add(pair)
-            rows.append({0: gene, 1: homolog})
+            rows.append({
+                'refmodelgene': gene,
+                'tarmodelgene': homolog,
+                'confidence_level': 'high'
+            })
     
     # 从 gx4 添加不重复的同源对
     for i in range(len(gx4.index)):
@@ -24,7 +28,11 @@ def homo(name):
         pair = (gene, homolog)
         if pair not in pairs:
             pairs.add(pair)
-            rows.append({0: gene, 1: homolog})
+            rows.append({
+                'refmodelgene': gene,
+                'tarmodelgene': homolog,
+                'confidence_level': 'low'
+            })
     
     gx3 = pd.DataFrame(rows)
     gx3.to_excel(f'working/{name}/matrix_homolog{name}_preforprottrans.xlsx', index=False)

@@ -7,6 +7,31 @@ import multiprocessing
 from tqdm import tqdm
 import subprocess
 
+def parse_usalign_metrics(output):
+    tm_scores = re.findall(r"TM-score=\s*([\d\.]+)", output)
+    aligned_match = re.search(r"Aligned length=\s*(\d+)", output)
+    length_matches = re.findall(
+        r"TM-score=\s*[\d\.]+\s+\(normalized by length of Structure_[12]: L=(\d+),",
+        output
+    )
+
+    if len(tm_scores) < 2:
+        return '', '', ''
+
+    tm_score_1 = float(tm_scores[0])
+    tm_score_2 = float(tm_scores[1])
+
+    if aligned_match and len(length_matches) >= 2:
+        aligned_length = int(aligned_match.group(1))
+        len_1 = int(length_matches[0])
+        len_2 = int(length_matches[1])
+        avg_coverage = round(((aligned_length / len_1) + (aligned_length / len_2)) / 2, 4)
+    else:
+        avg_coverage = ''
+
+
+    return tm_score_1, tm_score_2, avg_coverage
+
 
 def worker(i, gx, yeadict, name, refname, path):
     if gx.iat[i, 1]=='b448':
@@ -33,7 +58,8 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
         path=f'{pathwd}/struct_data/taryeast/{name}'
     d=1
     e=1
-    pdd=pd.DataFrame({1:[0],2:[0],3:[0],4:[0],5:[0],6:[0]})
+    avg_cov=''
+    pdd=pd.DataFrame({1:[0],2:[0],3:[0],4:[0],5:[0],6:[0],7:[0]})
     if cmd1==0 or cmd2==0:
         return pdd
 
@@ -45,20 +71,14 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
     try:
         res = subprocess.run(cmd, capture_output=True, text=True, check=True)
         output = res.stdout
-        tm_scores = re.findall(r"TM-score=\s*([\d\.]+)", output)
-        if len(tm_scores) >= 2:
-            d = float(tm_scores[0])  # 对应原来的 output[15]
-            e = float(tm_scores[1])  # 对应原来的 output[16]
-        else:
-            # print("Warning: Could not find enough TM-scores in output.")
-            d = e = ''
+        d, e, avg_cov = parse_usalign_metrics(output)
 
     except subprocess.CalledProcessError as e:
         print(f"Command execution failed: {e.stderr}")
-        d = e = ''
+        d = e = avg_cov = ''
     except Exception as ex:
         print(f"Parsing error occurred: {ex}")
-        d = e = ''
+        d = e = avg_cov = ''
 
     # print(f"Score 1: {d}, Score 2: {e}")
     # print('USalign done', cmd1, cmd2)
@@ -70,8 +90,16 @@ def tdblast(cmd1,cmd2,i,name,refname,path=''):
     else:
             f=''
             g=''
-    pdd=pd.concat([pd.DataFrame([gx.iat[i,1]]),pd.DataFrame([gx.iat[i,2]]),pd.DataFrame([d]),pd.DataFrame([e]),pd.DataFrame([g]),pd.DataFrame([f])],axis=1)
-    pdd.columns=[1,2,3,4,5,6]
+    pdd=pd.concat([
+        pd.DataFrame([gx.iat[i,1]]),
+        pd.DataFrame([gx.iat[i,2]]),
+        pd.DataFrame([d]),
+        pd.DataFrame([e]),
+        pd.DataFrame([g]),
+        pd.DataFrame([f]),
+        pd.DataFrame([avg_cov]),
+    ],axis=1)
+    pdd.columns=[1,2,3,4,5,6,7]
     return pdd
 
 def duiying1(a,yea):

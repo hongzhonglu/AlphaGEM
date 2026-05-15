@@ -1,88 +1,63 @@
-import numpy as np
-import pandas as pd
 import os
+import re
 import shutil
-def datahandel(name='',refname=''):
-    orth = pd.DataFrame()
-    path=os.getcwd()
-    if os.path.exists(f'{path}/orth/data/{name}'):
-        shutil.rmtree(f'{path}/orth/data/{name}')
-    os.mkdir(f'{path}/orth/data/{name}')
-    fasta=os.listdir(f'{path}/orth/data/{name}')
-    for i in fasta[0:-1]:
-        try:
-          os.remove(os.path.join(path+f'/orth/data/{name}',i))
-        except:
+import subprocess
+from itertools import product
+from pathlib import Path
+
+import pandas as pd
+
+
+MAX_GROUP_MEMBERS = 200
+ORTHOFINDER_ID_PATTERN = re.compile(r"\|([^|]+)\|")
+
+
+def _extract_orthofinder_ids(cell):
+    if not isinstance(cell, str) or not cell:
+        return []
+    return ORTHOFINDER_ID_PATTERN.findall(cell)
+
+
+def _latest_orthogroups_tsv(orthofinder_dir):
+    result_dirs = [item for item in orthofinder_dir.iterdir() if item.is_dir()]
+    if not result_dirs:
+        raise FileNotFoundError(f"No OrthoFinder result directory found in {orthofinder_dir}")
+    latest_dir = max(result_dirs, key=lambda item: item.stat().st_mtime)
+    return latest_dir / "Orthogroups" / "Orthogroups.tsv"
+
+
+def datahandel(name="", refname=""):
+    path = Path.cwd()
+    species_dir = path / "orth" / "data" / name
+
+    if species_dir.exists():
+        shutil.rmtree(species_dir)
+    species_dir.mkdir(parents=True, exist_ok=True)
+
+    shutil.copy(path / "data_available" / f"{refname}.fasta", species_dir / f"z-{refname}.fasta")
+    shutil.copy(path / "working" / name / f"{name}.fasta", species_dir / f"a-{name}.fasta")
+
+    subprocess.run(
+        ["python",str(path / "tools" / "OrthoFinder" / "orthofinder.py"), "-f", str(species_dir), "-og"],
+        check=True,
+    )
+
+    pathresult = _latest_orthogroups_tsv(species_dir / "OrthoFinder")
+    orth = pd.read_csv(pathresult, sep="\t", dtype=str).fillna("")
+
+    pair_rows = []
+    for _, row in orth.iterrows():
+        target_ids = _extract_orthofinder_ids(row.iloc[1])[:MAX_GROUP_MEMBERS]
+        ref_ids = _extract_orthofinder_ids(row.iloc[2])[:MAX_GROUP_MEMBERS]
+        if not target_ids or not ref_ids:
             continue
+        pair_rows.extend(product(ref_ids, target_ids))
 
-    shutil.copy(f'data_available/{refname}.fasta', f'orth/data/{name}/z-{refname}.fasta')
-    shutil.copy(f'working/{name}/{name}.fasta', f'orth/data/{name}/a-{name}.fasta')
-    os.system(
-        f'python {path}/tools/OrthoFinder/orthofinder.py -f {path}/orth/data/{name} -og' )
-    pathresult=f'{path}/orth/data/{name}/OrthoFinder/'+os.listdir(f'{path}/orth/data/{name}/OrthoFinder')[0]+'/Orthogroups/Orthogroups.tsv'
+    juzhen1 = pd.DataFrame(pair_rows)
 
-    with open(
-           pathresult) as orth1:  # key is the result of orthofinder
-        orth2 = orth1.read()
-        orth3 = orth2.split('\n')
-        for i in orth3[1:]:
-            orth = pd.concat([orth, np.transpose(pd.DataFrame(i.split('\t')))])
-    tyea = pd.DataFrame()  # kid is the yeast while the klg and kid2 is the yil
-    yea = pd.DataFrame()
-    orth = orth.fillna('none')
-    orth.astype(str)
-    for i in range(len(orth.index)):
-        tyea2 = pd.DataFrame(np.zeros([1, 2000]))
-        num = 0
-        num2 = 0
-        l = 0
-        bb = 0
-        for k in range(len(orth.iat[i, 1])):
-            if orth.iat[i, 1][num] == '|':
-                bb += 1
-                if bb % 2 == 1:
-                    num2 = num + 1
-                if bb % 2 == 0:
-                    tyea2.iat[0, l] = orth.iat[i, 1][num2:num]
-                    l += 1
-            num += 1
-        tyea = pd.concat([tyea, tyea2])
-    yea2 = pd.DataFrame()
-    for i in range(len(orth.index)):
-        yea3 = pd.DataFrame(np.zeros([1, 2000]))
-        num = 0
-        num2 = 0
-        l = 0
-        bb = 0
-        for k in range(len(orth.iat[i, 2])):
-            if orth.iat[i, 2][num] == '|':
-                bb += 1
-                if bb % 2 == 1:
-                    num2 = num + 1
-                if bb % 2 == 0:
-                    yea3.iat[0, l] = orth.iat[i, 2][num2:num]
-                    l += 1
-            num += 1
-        yea2 = pd.concat([yea2, yea3])
-    ref = pd.read_excel(
-        f'{path}/data_available/{refname}.xlsx')
-    yea = yea2
-    juzhen1 = pd.DataFrame()
-    for i in range(len(tyea.index)):
-        for j in range(200):
-            if tyea.iat[i, j] == 0.0:
-                break
-            for m in range(200):
-                if yea2.iat[i, m] == 0.0:
-                    break
-                jp = pd.concat([pd.DataFrame([yea2.iat[i, m]]), pd.DataFrame([tyea.iat[i, j]])], axis=1)
-                juzhen1 = pd.concat([juzhen1, jp])
-    ref2=[]
-    for i in range(len(ref.index)):
-        ref2.append(ref.iat[i,0])
-    for i in range(len(juzhen1.index)):
-            try:
-                juzhen1.iat[i,0]=ref.iat[ref2.index(juzhen1.iat[i,0]),2]
-            except:
-                continue
-    juzhen1.to_excel(f'working/{name}/matrix_orthofinder{name}.xlsx')
+    ref = pd.read_excel(path / "data_available" / f"{refname}.xlsx", dtype=str)
+    ref_map = dict(zip(ref.iloc[:, 0], ref.iloc[:, 2]))
+    if not juzhen1.empty:
+        juzhen1.iloc[:, 0] = juzhen1.iloc[:, 0].map(lambda value: ref_map.get(value, value))
+
+    juzhen1.to_excel(path / "working" / name / f"matrix_orthofinder{name}.xlsx")

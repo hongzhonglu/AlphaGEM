@@ -58,10 +58,10 @@ def main():
     parser.add_argument('--upTMscore', type=float, default=0.9, help='safe TMscore')
     parser.add_argument('--TMscoretrans', type=float,default=0.7, help='filter TMscoretrans')
     parser.add_argument('--coverage', type=float,default=0.8, help='filter coverage')
-    parser.add_argument('--upcoverage', type=float, default=0.9, help='safe coverage')
+    parser.add_argument('--upcoverage', type=float, default=0.95, help='safe coverage')
     parser.add_argument('--coveragetrans',type=float,default=0.8, help='filter coveragetrans')
     parser.add_argument('--pLDDT', type=float,default=70, help='filter pLDDT')
-    parser.add_argument('--esp', type=float, default=0.8, help='cluster esp')
+    parser.add_argument('--esp', type=float, default=1.0, help='cluster esp')
     parser.add_argument('--prottrans_distance', type=float, default=1.2, help='prottrans-distance')
     parser.add_argument('--grothmedium',type=str,default='min', help='grothmedium',choices=['min','full'])
     parser.add_argument('--essentialrxns', type=str, help='essential genes for gapfilling, an excel file')
@@ -115,10 +115,10 @@ def main():
     if not os.path.isfile(f'./working/{name}/{name}_embedding.pkl'):
         plmsearch_embedding.embedding_generate(name)
     if mode=='structure_alignment':
-        generate_list.generare_list_with_structure(name,listfile,structurefile)
-        orthofinder_datahandle.datahandel(name,refname)
-        US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
-        US_align_choose.US_align_choose(name,USalignfilter)
+        # generate_list.generare_list_with_structure(name,listfile,structurefile)
+        # orthofinder_datahandle.datahandel(name,refname)
+        # US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
+        # US_align_choose.US_align_choose(name,USalignfilter)
         foldseek_knock1.foldseekfind(path_taryeast_structure, name, refname)
         foldseek_choose.foldseek_choose(name, refname, path_taryeast_structure)
         foldseek_choose2.foldseek_choose2(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDT)
@@ -143,14 +143,14 @@ def main():
         mkdir.mvfile(name, refname, threshold, cov_threshold, id_threshold, cov_thre, pid_thre, direction)
 
 
-    use_eggnog.eggnog(name,refname, 1)
-    use_clean.clean_result(name)
-    use_deepectransformer.use_deepectransformer(name)
-    use_rhea.rhea(name,refname)
-    multiple_annotition_for_nonhomogene.nonhome(name,True,True)
-    general_reactions_to_spe.get_spe_reactions(name)
-    add_reactions_based_pool.model_reaction(name,refmodel)
-    gapfilling.gapfill(name, refname,refmodel,grothmedium,essential)
+    # use_eggnog.eggnog(name,refname, 1)
+    # use_clean.clean_result(name)
+    # use_deepectransformer.use_deepectransformer(name)
+    # use_rhea.rhea(name,refname)
+    # multiple_annotition_for_nonhomogene.nonhome(name,True,True)
+    # general_reactions_to_spe.get_spe_reactions(name)
+    # add_reactions_based_pool.model_reaction(name,refmodel)
+    # gapfilling.gapfill(name, refname,refmodel,grothmedium,essential)
 
 
 if __name__=='__main__':
