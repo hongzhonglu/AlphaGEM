@@ -1,1 +1,0 @@
-"""AlphaGEM web backend package."""

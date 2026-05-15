@@ -5,6 +5,8 @@ tmpFolder/*
 temp/*
 working/*
 calculate/
+web-backend/
+web-frontend/
 src/_pycache_/
 bac/*
 # 明显超大数据目录
