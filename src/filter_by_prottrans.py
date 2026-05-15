@@ -78,7 +78,24 @@ def findtargethomos(data,dataindex,distance=1.2):
     close_points = distances <= distance_threshold
     return dataindex[close_points]
 
-def filter_by_prottrans(name,refname,distance):
+def findtargethomos_by_level(data, dataindex, level_map, low_distance=1.2, high_distance=None):
+    if high_distance is None:
+        high_distance = low_distance
+    if len(data) <= 1:
+        return dataindex
+    target_data = data[0]
+    distances = pairwise_distances([target_data], data, metric='euclidean')[0]
+    min_distance = min(distances[1:])
+    selected = [dataindex[0]]
+    for idx in range(1, len(dataindex)):
+        gene = dataindex[idx]
+        level = level_map.get(gene, 'low')
+        threshold_factor = high_distance if level == 'high' else low_distance
+        if distances[idx] <= threshold_factor * min_distance:
+            selected.append(gene)
+    return np.array(selected)
+
+def filter_by_prottrans(name,refname,distance,high_distance=1.8):
     batch_size=8
     model, tokenizer, device = load_model()
     
@@ -88,7 +105,11 @@ def filter_by_prottrans(name,refname,distance):
     current_batch_size = batch_size
     
     homologs = pd.read_excel(f'working/{name}/matrix_homolog{name}_preforprottrans.xlsx')
-    groupedhomologs={homos[0]:list(homos[1][1]) for homos in homologs.groupby(0)}
+    if 'confidence_level' not in homologs.columns:
+        homologs['confidence_level'] = 'high'
+    groupedhomologs = {}
+    for refgene, group in homologs.groupby('refmodelgene'):
+        groupedhomologs[refgene] = list(zip(group['tarmodelgene'], group['confidence_level']))
     if refname == 'yeast':
         refmodel = cobra.io.read_sbml_model('models/yeast-GEM.xml')
     if refname == 'ecoli':
@@ -104,15 +125,23 @@ def filter_by_prottrans(name,refname,distance):
         if i in genes:
             sortedgenes[i]=groupedhomologs[i]
         else:
-            for gene in groupedhomologs[i]:
+            for gene, _level in groupedhomologs[i]:
                 final_homologs.append([i,gene])
     indexes=[]
     genes2embedding=[]
     for i in sortedgenes.keys():
-        if len(list(set(sortedgenes[i])))>1:
-            genes2embedding.append((i,list(set(sortedgenes[i]))))
+        level_map = {}
+        unique_genes = []
+        for gene, level in sortedgenes[i]:
+            if gene not in level_map:
+                unique_genes.append(gene)
+                level_map[gene] = level
+            elif level == 'high':
+                level_map[gene] = 'high'
+        if len(unique_genes)>1:
+            genes2embedding.append((i, unique_genes, level_map))
         else:
-            final_homologs.append([i,sortedgenes[i][0]])
+            final_homologs.append([i, unique_genes[0]])
     indexseq=[]
     records1={record.id.split('|')[1]:str(record.seq) for record in SeqIO.parse(f'./data_available/{refname}.fasta','fasta')}
     records2={record.id.split('|')[1]:str(record.seq) for record in SeqIO.parse(f'./working/{name}/{name}.fasta','fasta')}
@@ -206,7 +235,7 @@ def filter_by_prottrans(name,refname,distance):
     embeddings={}
     for i in range(len(indexes)):
         embeddings[indexes[i]]=indexemb[i]
-    del indexemb,indexseq,records1,records2,indexes
+    del indexemb,indexseq,indexes
     with open('working/{name}/{name}.emb'.format(name=name), 'wb') as handle:
         # noinspection PyTypeChecker
         pickle.dump(embeddings, handle)
@@ -231,9 +260,16 @@ def filter_by_prottrans(name,refname,distance):
                     continue
             dataindex.append(gene)
         dataindex=np.array(dataindex)
-        homoss=findtargethomos(data,dataindex,distance)[1:]
+        homoss=findtargethomos_by_level(
+            data,
+            dataindex,
+            genes[2],
+            low_distance=distance,
+            high_distance=high_distance
+        )[1:]
         for homomomo in homoss:
             final_homologs.append([genes[0],homomomo])
+    del records1, records2
     pd.DataFrame(final_homologs).to_excel(f'working/{name}/matrix_homolog{name}.xlsx')
     
     # Clean up memory
@@ -243,6 +279,4 @@ def filter_by_prottrans(name,refname,distance):
         del tokenizer
     gc.collect()
     torch.cuda.empty_cache()
-
-
 

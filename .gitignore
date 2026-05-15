@@ -1,4 +1,6 @@
 # 常见临时/中间结果
+agents.md
+AGENTS.md
 tmpFolder/*
 temp/*
 working/*
@@ -20,4 +22,3 @@ data_source.tar.xz
 
 
 # 大文件类型（按需）
-

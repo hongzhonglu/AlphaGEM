@@ -20,8 +20,35 @@ def foldseekfind(path_taryeast_structure='',name='',refname=''):
 
     def bidui():
         global df_foldseek_find
-        os.system(
-            f'foldseek easy-search {pathwd}/struct_data/{refname} {pathwd}/struct_data/taryeast/{name}db/{name}db {pathwd}/working/{name}/aln{name}.csv tmpFolder --format-output "query,target,alntmscore,prob,qcov,tcov" --alignment-type 2 -e 0.00001')
+        output_file = f'{pathwd}/working/{name}/aln{name}.csv'
+        foldseek_cmds = [
+            (
+                'alntmscore',
+                f'foldseek easy-search {pathwd}/struct_data/{refname} '
+                f'{pathwd}/struct_data/taryeast/{name}db/{name}db {output_file} tmpFolder '
+                f'--format-output "query,target,alntmscore,prob,qcov,tcov" --alignment-type 2 -e 0.00001'
+            ),
+            (
+                'qtmscore',
+                f'foldseek easy-search {pathwd}/struct_data/{refname} '
+                f'{pathwd}/struct_data/taryeast/{name}db/{name}db {output_file} tmpFolder '
+                f'--format-output "query,target,qtmscore,prob,qcov,tcov" --alignment-type 2 -e 0.00001'
+            )
+        ]
+        return_code = 1
+        for score_name, command in foldseek_cmds:
+            return_code = os.system(command)
+            if return_code == 0:
+                print(f'foldseek easy-search succeeded with score field: {score_name}')
+                break
+            print(f'foldseek easy-search failed with score field: {score_name}')
+
+        if return_code != 0:
+            raise RuntimeError(
+                'foldseek easy-search failed. '
+                'Please check whether Foldseek is installed and whether this version supports the requested format-output fields.'
+            )
+
         aln = pd.read_csv(f'{pathwd}/working/{name}/aln{name}.csv',sep='\t',names=['ref','tar','tms','pro','rcov','tcov'])
         # aln2 = aln[aln['pro'] >= 1]
         aln2 = aln[aln['pro'] >= 1]
