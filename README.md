@@ -1,7 +1,7 @@
 AlphaGEM
 ======
-_AlphaGEM Enables Precise Genome-Scale Metabolic Modelling by Integrating Protein Structure Alignment with deep-learning-based Dark Metabolism Mining_
-_doi: https://doi.org/10.1101/2025.07.21.665674_
+_Han, W., Xiao, L., Sun, H. et al. AlphaGEM enables precise genome-scale metabolic modelling by integrating protein structure alignment with deep-learning-based dark metabolism mining. Nat Commun (2026). https://doi.org/10.1038/s41467-026-75549-w_
+
  >## Platform: Ubuntu only (tested on Ubuntu 20.04/22.04). #
 
  
