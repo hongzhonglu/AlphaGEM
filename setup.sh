@@ -18,21 +18,30 @@ else
   echo "Ubuntu only. /etc/os-release not found." >&2
   exit 1
 fi
-if [ ! -d "./tools" ] || [ ! -d "./data_available" ] || [ ! -d "./plmsearchtools" ] || [ ! -d "./struct_data" ]; then
+if [ ! -f "resource-manifest.json" ] || [ "${ALPHAGEM_EXTRACT_RESOURCES:-0}" = "1" ]; then
   if [ -f "data_source.tar.xz" ]; then
+    sha256sum -c data_source.tar.xz.sha256
     log "Extracting data_source.tar.xz"
     tar -xJf data_source.tar.xz
     log "Extraction complete"
   else
-    log "data_source.tar.xz not found, skip extraction"
+    echo "Put the matching data_source.tar.xz in this checkout first." >&2
+    exit 1
   fi
 else
-  log "Data directories already present, skip extraction"
+  log "Resource manifest already present; verifying installed files"
 fi
+"$PYTHON" scripts/verify_resources.py
+mkdir -p temp working struct_data/taryeast tools/CLEAN/app/data/inputs tools/CLEAN/app/data/esm_data tools/CLEAN/app/results/inputs
+for reference in yeast ecoli human strco synechocystis; do
+  if [ -f "data_available/${reference}.fasta" ]; then
+    makeblastdb -in "data_available/${reference}.fasta" -dbtype prot
+  fi
+done
 if ! command -v foldseek >/dev/null 2>&1; then
   if command -v conda >/dev/null 2>&1; then
     log "Installing foldseek via conda"
-    conda install -y -c bioconda -c conda-forge foldseek
+    conda install -y -c conda-forge -c bioconda foldseek=9.427df8a
     log "foldseek install finished"
   else
     log "conda not found, skip foldseek install"
@@ -43,7 +52,7 @@ fi
 if ! command -v diamond >/dev/null 2>&1; then
   if command -v conda >/dev/null 2>&1; then
     log "Installing diamond via conda"
-    conda install -y -c bioconda -c conda-forge diamond
+    conda install -y -c conda-forge -c bioconda diamond=2.1.10
     log "diamond install finished"
   else
     log "conda not found, skip diamond install"
@@ -51,18 +60,11 @@ if ! command -v diamond >/dev/null 2>&1; then
 else
   log "diamond already present"
 fi
-if [ -d "./tools/eggnog_mapper" ]; then
-  if [ ! -d "./tools/eggnog_mapper/data" ] || [ ! -f "./tools/eggnog_mapper/data/eggnog.db" ]; then
-    log "Downloading eggNOG data"
-    pushd ./tools/eggnog_mapper >/dev/null
-    yes | "$PYTHON" download_eggnog_data.py
-    popd >/dev/null
-    log "eggNOG data ready"
-  else
-    log "eggNOG data already present"
-  fi
+if [ "${ALPHAGEM_SKIP_TOOL_DATABASES:-0}" = "1" ]; then
+  log "Tool databases deferred; install them before running annotation"
 else
-  log "eggnog_mapper directory not found, skip"
+  read -r -a eggnog_taxa <<< "${ALPHAGEM_EGGNOG_TAXA:-fungi}"
+  "$PYTHON" scripts/install_tool_databases.py --taxa "${eggnog_taxa[@]}"
 fi
 if [ -d "./tools/CLEAN/app" ]; then
   log "Installing CLEAN from ./tools/CLEAN/app"
