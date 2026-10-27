@@ -10,6 +10,8 @@ import tqdm
 import matplotlib.pyplot as plt
 import os
 import glob
+import subprocess
+from src.reference_mapping import map_reference_pairs
 import tqdm
 #from matplotlib_venn import venn2
 def result_blast(name,refname,threshold):
@@ -84,7 +86,9 @@ def result_blast(name,refname,threshold):
             if best_result:
                 blast_results.append(best_result)
     # 保存结果到DataFrame
-    result_df = pd.DataFrame(blast_results)
+    result_df = pd.DataFrame(blast_results, columns=[
+        "Gene1", "Gene2", "E-value", "Score", "Identity", "Alignment Length", "COV1", "COV2"
+    ])
     query_lengths = get_gene_lens(f"{name}.fasta", in_folder=f'./working/{name}')
     subject_lengths = get_gene_lens(f"{refname}.fasta", in_folder="./data_available")
 
@@ -119,7 +123,7 @@ def make_blast_db(id, folder='prots', db_type='prot'):
 
     print('making blast db with following command line...')
     print(cmd_line)
-    os.system(cmd_line)
+    subprocess.run(["makeblastdb", "-in", f"{folder}/{id}", "-dbtype", db_type], check=True)
 
 
 def run_blastp(seq, db, in_folder1='prots',in_folder2=None, out="result", outfmt=6, evalue=0.001, threads=1):
@@ -132,12 +136,10 @@ def run_blastp(seq, db, in_folder1='prots',in_folder2=None, out="result", outfmt
 
     print('running blastp with following command line...')
     print(cmd_line)
-    exit_code = os.system(cmd_line)
-
-    if exit_code == 0:
-        print("Command executed successfully!")
-    else:
-        print(f"Command failed with exit code {exit_code}.")
+    subprocess.run([
+        "blastp", "-db", db, "-query", seq, "-out", out,
+        "-evalue", str(evalue), "-outfmt", str(outfmt), "-num_threads", str(threads),
+    ], check=True)
     return out
 
 
@@ -206,9 +208,9 @@ def bbh_analysis(query, subject, in_fold1,in_fold2,cov_thre):
     # bbh2 = pd.read_csv('%s/bench_target.txt' % (in_fold1), sep='\t', names=cols)
     # bbh2 = pd.merge(bbh2, subject_lengths)
     # bbh2['COV'] = bbh2['alnLength'] / bbh2['gene_length']
-    out = pd.DataFrame()
     bbh=pd.read_csv(f"{in_fold1}/bbh_cov.csv")
     bbh2=pd.read_csv(f"{in_fold1}/bbh2_cov.csv")
+    out = pd.DataFrame(columns=list(bbh.columns) + ["BBH"])
     # Filter the genes based on coverage
     bbh = bbh[bbh.COV >= cov_thre]
     bbh2 = bbh2[bbh2.COV >= cov_thre]
@@ -238,29 +240,27 @@ def bbh_analysis(query, subject, in_fold1,in_fold2,cov_thre):
 
 
 
-def bbh(name,refname,threshold,cov_thre=0.25,pid_thre=50,direction="bidirect"):
-    yea = pd.read_excel(f"./data_available/{refname}.xlsx")
-    gene_dict = yea.set_index('Gene Names (ordered locus)')['Entry'].to_dict()
-    gene_dict2 = yea.set_index('Entry')['Gene Names (ordered locus)'].to_dict()
+def bbh(name,refname,threshold,cov_thre=0.25,pid_thre=60.0,direction="direct"):
     make_blast_db(f"{name}.fasta", f"./working/{name}")
     #make_blast_db(f"{refname}.fasta", "./working")
     query=f"{name}.fasta"
     subject=f"{refname}.fasta"
     infold1=f"./working/{name}/"
     infold2="./data_available/"
-    if os.path.exists(f'./working/{name}/bbh_parsed_{str(cov_thre)}.csv'):
-        bbh_df=pd.read_csv(f'./working/{name}/bbh_parsed_{str(cov_thre)}.csv')
-    else:
-        get_bbh(query, subject, infold1, infold2, cov_thre)
-        bbh_df = bbh_analysis(query, subject, infold1, infold2, cov_thre)
+    # Recompute against the current FASTAs: a coverage-only cache key does not
+    # identify the input proteomes or reference species.
+    get_bbh(query, subject, infold1, infold2, cov_thre)
+    bbh_df = bbh_analysis(query, subject, infold1, infold2, cov_thre)
     if direction=="bidirect":
         bbh_df = bbh_df[bbh_df["BBH"] == '<=>']
     else:
         pass
-    if len(bbh_df) != 0:
-        bbh_df = bbh_df[bbh_df["PID"] > pid_thre]
-        bbh_df['subject'] = bbh_df['subject'].replace(gene_dict2)
-        bbh_df.rename(columns={"subject": 'Gene1', 'gene': 'Gene2'}, inplace=True)
+    bbh_df = bbh_df[bbh_df["PID"] > pid_thre].copy()
+    bbh_df = map_reference_pairs(
+        bbh_df, 'subject', 'gene', refname,
+        f'working/{name}/{name}_bbh_unmapped_reference.json',
+    )
+    bbh_df.rename(columns={"subject": "Gene1", "gene": "Gene2"}, inplace=True)
     bbh_df.to_excel(
             f"./working/{name}/{name}_ss{threshold}_bbh_pid{str(pid_thre)}_cov{str(cov_thre)}_{direction}.xlsx")
 

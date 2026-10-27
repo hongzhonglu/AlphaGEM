@@ -8,6 +8,14 @@ calculate/
 web-backend/
 web-frontend/
 src/_pycache_/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.codex-build/
+.codex-finalizer/
+deliverables/
+resource-manifest.json
+RESOURCE_BUNDLE_README.txt
 bac/*
 # 明显超大数据目录
 struct_data/

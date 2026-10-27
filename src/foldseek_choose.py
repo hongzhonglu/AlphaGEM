@@ -70,7 +70,7 @@ def tdblast(cmd1, cmd2, i, name, refname, path='', tardict=None, refdict=None):
     })])
 def foldseek_choose(name,refname,path=''):
     read_gx(name)
-    tardict,refdict=plddt_datacreate(name,refname)
+    tardict,refdict=plddt_datacreate(name,refname,path)
     for i in tqdm(range(len(gx.index)),'find pLDDT'):
         tdblast(gx.iat[i, 1], gx.iat[i, 2], i, name,refname, path,tardict,refdict)
     print(gx2)

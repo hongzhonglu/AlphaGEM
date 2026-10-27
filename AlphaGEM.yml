@@ -1,6 +1,5 @@
 name: AlphaGEM
 channels:
-  - gurobi
   - bioconda
   - defaults
   - conda-forge
@@ -36,7 +35,6 @@ dependencies:
   - gettext=0.22.5
   - gettext-tools=0.22.5
   - gmp=6.3.0
-  - gurobi=11.0.3
   - h11=0.14.0
   - ipykernel=6.29.5
   - jedi=0.19.2
@@ -260,6 +258,8 @@ dependencies:
       - omegaconf==2.3.0
       - openpyxl==3.1.5
       - optlang==1.8.2
+      - optlang-copt==0.2.1
+      - coptpy==8.0.6
       - outcome==1.3.0.post0
       - pandas==2.2.3
       - panel==1.5.5

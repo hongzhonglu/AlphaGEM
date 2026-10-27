@@ -1,3 +1,4 @@
+from src.gpr_transfer import has_gene_token, replace_gene_token
 import cobra
 import pandas as pd
 import numpy as np
@@ -70,8 +71,8 @@ def change_gpr_forsco(canmod,cangenes):
             if pan > 1:
                 rule_pre=rule_pre+' or '+gx3.iat[i, 2]
             for n1 in range(len(canmod.reactions)):
-                if cangenes[a] in canmod.reactions[n1].gene_reaction_rule:
-                    canmod.reactions[n1].gene_reaction_rule = canmod.reactions[n1].gene_reaction_rule.replace(cangenes[a],'('+rule_pre+')')
+                if has_gene_token(canmod.reactions[n1].gene_reaction_rule, cangenes[a]):
+                    canmod.reactions[n1].gene_reaction_rule = replace_gene_token(canmod.reactions[n1].gene_reaction_rule, cangenes[a], '('+rule_pre+')')
     return canmod
 
 
@@ -80,12 +81,12 @@ def str_chanege_for_gpr(old_gpr,oldgene,newgenes):
     oldgprcell=old_gpr.split(' or ')
     gprcell=[]
     for a in oldgprcell:
-        if oldgene in a:
+        if has_gene_token(a, oldgene):
             for genes in newgenes:
                 if 'and' in a:
-                    gprcell.append('('+a.replace(oldgene,genes).replace('(','').replace(')','')+')')
+                    gprcell.append('('+replace_gene_token(a, oldgene, genes).replace('(','').replace(')','')+')')
                 else:
-                    gprcell.append(a.replace(oldgene, genes).replace('(', '').replace(')', ''))
+                    gprcell.append(replace_gene_token(a, oldgene, genes).replace('(', '').replace(')', ''))
         else:
             if 'and' in a:
                 gprcell.append('('+a.replace('(','').replace(')','')+')')
@@ -129,6 +130,8 @@ def modelbuild(refmodel,name=''):
         canmod=change_gpr(canmod,cangenes,dict)
     else:
         canmod=change_gpr_forsco(canmod,cangenes)
+    # Updating a COBRA GPR leaves the old gene object in the model collection.
+    cobra.manipulation.remove_genes(canmod, [gene for gene in canmod.genes if not gene.reactions])
     cobra.io.save_yaml_model(canmod, f'working/{name}/model1{name}.yml')
     end_time = time.time()
     print('the time it cost is' + str(end_time - start_time) + 's')

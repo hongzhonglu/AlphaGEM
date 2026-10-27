@@ -2,10 +2,36 @@
 import pandas as pd
 import os
 import shutil
+import re
+import subprocess
 import time
+
+
+def _require_foldseek_output(executable='foldseek'):
+    """Reject old binaries before creating databases or overwriting results."""
+    help_result = subprocess.run(
+        [executable, 'convertalis', '-h'], check=True, capture_output=True, text=True
+    )
+    output = help_result.stdout + help_result.stderr
+    required = ('alntmscore', 'prob', 'qcov', 'tcov')
+    missing = [field for field in required if not re.search(r'\b' + field + r'\b', output)]
+    if missing:
+        version = subprocess.run(
+            [executable, 'version'], check=True, capture_output=True, text=True
+        ).stdout.strip()
+        raise RuntimeError(
+            f'Foldseek {version} cannot produce required fields: {", ".join(missing)}. '
+            'Install the version declared in AlphaGEM.yml with '
+            '"conda install -n AlphaGEM -c conda-forge -c bioconda foldseek=9.427df8a". '
+            'AlphaGEM requires alignment-normalized TM scores; query-normalized '
+            'TM scores are not an interchangeable fallback.'
+        )
+
+
 df_foldseek_find = pd.DataFrame()
 def foldseekfind(path_taryeast_structure='',name='',refname=''):
     global df_foldseek_find
+    _require_foldseek_output()
     pathwd=os.getcwd()
     if path_taryeast_structure=='':
         path_taryeast_structure=f'{pathwd}/struct_data/taryeast/{name}'
@@ -15,39 +41,20 @@ def foldseekfind(path_taryeast_structure='',name='',refname=''):
         os.mkdir(f'{pathwd}/struct_data/taryeast/{name}db')
     except:
         print('has created')
-    os.system(
-        f'foldseek createdb {path_taryeast_structure}/ {pathwd}/struct_data/taryeast/{name}db/{name}db')
+    subprocess.run(
+        ['foldseek', 'createdb', path_taryeast_structure,
+         f'{pathwd}/struct_data/taryeast/{name}db/{name}db'], check=True)
 
     def bidui():
         global df_foldseek_find
         output_file = f'{pathwd}/working/{name}/aln{name}.csv'
-        foldseek_cmds = [
-            (
-                'alntmscore',
-                f'foldseek easy-search {pathwd}/struct_data/{refname} '
-                f'{pathwd}/struct_data/taryeast/{name}db/{name}db {output_file} tmpFolder '
-                f'--format-output "query,target,alntmscore,prob,qcov,tcov" --alignment-type 2 -e 0.00001'
-            ),
-            (
-                'qtmscore',
-                f'foldseek easy-search {pathwd}/struct_data/{refname} '
-                f'{pathwd}/struct_data/taryeast/{name}db/{name}db {output_file} tmpFolder '
-                f'--format-output "query,target,qtmscore,prob,qcov,tcov" --alignment-type 2 -e 0.00001'
-            )
-        ]
-        return_code = 1
-        for score_name, command in foldseek_cmds:
-            return_code = os.system(command)
-            if return_code == 0:
-                print(f'foldseek easy-search succeeded with score field: {score_name}')
-                break
-            print(f'foldseek easy-search failed with score field: {score_name}')
-
-        if return_code != 0:
-            raise RuntimeError(
-                'foldseek easy-search failed. '
-                'Please check whether Foldseek is installed and whether this version supports the requested format-output fields.'
-            )
+        subprocess.run(
+            ['foldseek', 'easy-search', f'{pathwd}/struct_data/{refname}',
+             f'{pathwd}/struct_data/taryeast/{name}db/{name}db', output_file,
+             f'{pathwd}/working/{name}/foldseek_tmp', '--format-output',
+             'query,target,alntmscore,prob,qcov,tcov', '--alignment-type', '2',
+             '-e', '0.00001'], check=True)
+        print('foldseek easy-search succeeded with score field: alntmscore')
 
         aln = pd.read_csv(f'{pathwd}/working/{name}/aln{name}.csv',sep='\t',names=['ref','tar','tms','pro','rcov','tcov'])
         # aln2 = aln[aln['pro'] >= 1]

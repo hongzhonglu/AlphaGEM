@@ -1,7 +1,6 @@
 import gc
 import tqdm
 import cobra
-from transformers import T5Tokenizer, T5EncoderModel
 import torch
 import pickle
 import re
@@ -13,6 +12,8 @@ from Bio import SeqIO
 import findrefnames
 
 def load_model():
+    from transformers import T5EncoderModel, T5Tokenizer
+
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(f"Loading model on {device}...")
     
@@ -279,4 +280,3 @@ def filter_by_prottrans(name,refname,distance,high_distance=1.8):
         del tokenizer
     gc.collect()
     torch.cuda.empty_cache()
-

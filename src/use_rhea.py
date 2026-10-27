@@ -4,23 +4,26 @@ import shutil
 import numpy as np
 from Bio import SeqIO
 
-from plmsearch import rhea_search
-from ss_predict_choose import ss_predict_choose_rhea
-
 def process_rhea(name,refname,threshold,left):
     header=["ID","Query"]
-    rhea_homo=pd.read_excel(f"./working/{name}/{name}_rhea_homolog{str(threshold)}.xlsx",index_col=0,header=None,names=header)
+    rhea_homo=pd.read_excel(f"./working/{name}/{name}_rhea_homolog{str(threshold)}.xlsx",index_col=0)
     rhea_homo.reset_index(drop=True,inplace=True)
     if rhea_homo.empty:
         print("No rhea homologs found")
-        rhea_homo=pd.DataFrame({"ID":[],"Query":[]})
-    rhea_homo = rhea_homo.drop(0)
+        rhea_homo=pd.DataFrame(columns=header)
+    else:
+        if len(rhea_homo.columns) != 2:
+            raise ValueError('Rhea homolog table must contain reference and target protein columns')
+        rhea_homo.columns=header
     rhea_homo = rhea_homo[~rhea_homo["Query"].isin(left)]
     gene_rhea=pd.read_csv(f"./rhea/rhea2uniprot_sprot.tsv",sep="\t")
     gene2rheaid=gene_rhea.set_index("ID")["RHEA_ID"].to_dict()
     rhea_homo["Rhea_id"]=rhea_homo["ID"].map(gene2rheaid)
     rhea_homo.to_excel(f"./working/{name}/{name}_rheaid_plmsearch.xlsx")
 def rhea(name,refname,threshold=0.9):
+    from plmsearch import rhea_search
+    from ss_predict_choose import ss_predict_choose_rhea
+
     path=os.getcwd()
     tary = []
     homo = pd.read_excel(f'./working/{name}/matrix_homolog{name}.xlsx')

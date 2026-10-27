@@ -62,7 +62,7 @@ def eggnog(name,refname,i=1):
             left.iat[i, 1], left.iat[i, 2] = '-', '-'
     eggnogannop = pd.DataFrame()
     for i in range(len(left.index)):
-        if left.iat[i, 2] != '-':
+        if left.iat[i, 1] not in ('-', '') or left.iat[i, 2] not in ('-', ''):
             eggnogannop = pd.concat([eggnogannop, left.iloc[[i], [0, 1, 2]]])
     eggnogannop.index = range(len(eggnogannop.index))
     eggnogannop.to_excel(f'working/{name}/eggec2{name}.xlsx')

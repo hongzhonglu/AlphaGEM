@@ -30,12 +30,14 @@ import model_build2
 import use_clean
 import use_eggnog
 import use_rhea
-import multiple_annotition_for_nonhomogene
-import general_reactions_to_spe
 import gapfilling
 import use_deepectransformer
-import add_reactions_based_pool
 import generate_list
+import legacy_annotation
+import add_reactions_based_pool
+from src.solver_config import add_solver_arguments, nonnegative_number, positive_number, select_solver, write_solver_manifest
+from src.plmsearch_pipeline import add_plmsearch_arguments, PlmsearchSettings, run_homolog_search
+from src.reference_mapping import load_reference_loci
 
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -50,7 +52,7 @@ def main():
     parser.add_argument('--refname', default='yeast',type=str, help='reference name',choices=['yeast','human','ecoli','strco','synechocystis'])
     parser.add_argument('--name', type=str, help='target GEMs name')
     parser.add_argument('--fasta',default='', type=str, help='your target species genome')
-    parser.add_argument('--maplist', type=str,default='', help='mapping list of structures and genes names')
+    parser.add_argument('--maplist', '--list', type=str,default='', help='mapping list of structures and genes names')
     parser.add_argument('--structure', type=str,default='', help='files you store structures')
     parser.add_argument('--cleanuse', type=bool, help='whether you have used CLEAN')
     parser.add_argument('--USalignfilter',type=float,help='US alignment filter',default=0.5)
@@ -65,12 +67,24 @@ def main():
     parser.add_argument('--prottrans_distance', type=float, default=1.2, help='prottrans-distance')
     parser.add_argument('--grothmedium',type=str,default='min', help='grothmedium',choices=['min','full'])
     parser.add_argument('--essentialrxns', type=str, help='essential genes for gapfilling, an excel file')
+    parser.add_argument('--gapfill-time-limit', type=positive_number, default=3600,
+                        help='maximum seconds for each gapfilling MIP solve; default: 3600')
+    parser.add_argument('--gapfill-soft-mem-limit', type=positive_number, default=8,
+                        help='memory limit in GB: Gurobi SoftMemLimit / COPT MemLimit; default: 8')
+    parser.add_argument('--gapfill-mip-gap', type=nonnegative_number, default=0.01,
+                        help='accepted relative MIP gap for gapfilling; default: 0.01')
+    add_solver_arguments(parser)
+    add_plmsearch_arguments(parser)
     args = parser.parse_args()
     mode=args.mode
     fasta=args.fasta
     if fasta=='':
         print('No fasta file')
         sys.exit()
+    try:
+        select_solver(args.solver)
+    except (RuntimeError, ValueError) as error:
+        parser.error(str(error))
     refname=args.refname
     if refname=='':
         print('please specify a reference name, we chosed yeast as default')
@@ -91,6 +105,9 @@ def main():
     spe=args.esp
     distance=args.prottrans_distance
     grothmedium=args.grothmedium
+    gapfill_time_limit=args.gapfill_time_limit
+    gapfill_soft_mem_limit=args.gapfill_soft_mem_limit
+    gapfill_mip_gap=args.gapfill_mip_gap
     if args.essentialrxns:
         essential=[i for i in pd.read_excel(args.essentialrxns)['reaction_id']]
     else:
@@ -111,50 +128,49 @@ def main():
         os.mkdir(f'./working/{name}')
     except FileExistsError:
         pass
+    write_solver_manifest(f'working/{name}/solver.json')
     fasta_handle.handle(fasta,name)
-    if not os.path.isfile(f'./working/{name}/{name}_embedding.pkl'):
-        plmsearch_embedding.embedding_generate(name)
+    # Check the mapping resource before loading the large ESM checkpoint.
+    load_reference_loci(refname)
+    plmsearch_embedding.embedding_generate(name)
     if mode=='structure_alignment':
         generate_list.generare_list_with_structure(name,listfile,structurefile)
         orthofinder_datahandle.datahandel(name,refname)
-        US_align_knock1.US_align_find(name, path_taryeast_structure,refname,path_reference_structure)
+        target_structure = structurefile or path_taryeast_structure
+        US_align_knock1.US_align_find(name, target_structure,refname,path_reference_structure)
         US_align_choose.US_align_choose(name,USalignfilter)
-        foldseek_knock1.foldseekfind(path_taryeast_structure, name, refname)
-        foldseek_choose.foldseek_choose(name, refname, path_taryeast_structure)
+        foldseek_knock1.foldseekfind(target_structure, name, refname)
+        foldseek_choose.foldseek_choose(name, refname, target_structure)
         foldseek_choose2.foldseek_choose2(refname,refmodel,name,TMscoretrans,coveragetrans,TMscore,coverage,pLDDT)
         foldseekcluster.cluster(name,spe,uptm=upTMscore,upcov=upcoverage)
         homolog_concat2.homo(name)
         filter_by_prottrans.filter_by_prottrans(name,refname,distance)
         pass
     if mode=='plmsearch':
-        threshold = 0.95
-        cov_thre = 0.8#双向blast阈值
-        cov_threshold = 0.9#plmsearch阈值
-        pid_thre = 70#双向blast阈值
-        id_threshold = 70#plmsearch阈值
-        direction = "direct"
-        generate_list.generare_list_without_structure(name)
-        plmsearch.ss_predictor(refname, name,threshold)
-        ss_predict_choose.ss_predict_choose(name, refname, threshold)
-        cov_filter.result_blast(name, refname, threshold)
-        cov_filter.cov_filter(name, refname, threshold, cov_threshold, id_threshold)
-        cov_filter.bbh(name, refname, threshold, cov_thre, pid_thre, direction)
-        cov_filter.merge(name, refname, threshold, cov_threshold, id_threshold, cov_thre, pid_thre, direction)
-        mkdir.mvfile(name, refname, threshold, cov_threshold, id_threshold, cov_thre, pid_thre, direction)
+        run_homolog_search(name, refname, PlmsearchSettings.from_args(args))
     model_build1.modelbuild(refmodel,name)
     model_build2.modelbuild(refmodel, name)
     use_eggnog.eggnog(name,refname, 1)
     use_clean.clean_result(name)
     use_deepectransformer.use_deepectransformer(name)
     use_rhea.rhea(name,refname)
-    multiple_annotition_for_nonhomogene.nonhome(name,True,True)
-    general_reactions_to_spe.get_spe_reactions(name)
-    add_reactions_based_pool.model_reaction(name,refmodel)
-    gapfilling.gapfill(name, refname,refmodel,grothmedium,essential)
+    legacy_annotation.nonhome(name, True, True)
+    legacy_annotation.get_spe_reactions(name)
+    add_reactions_based_pool.model_reaction(name, refmodel)
+    gapfilling.gapfill(
+        name,
+        refname,
+        refmodel,
+        grothmedium,
+        essential,
+        use_full=(grothmedium == 'full'),
+        time_limit=gapfill_time_limit,
+        soft_mem_limit=gapfill_soft_mem_limit,
+        mip_gap=gapfill_mip_gap,
+    )
 
 
 if __name__=='__main__':
     main()
     t2=time.time()
     print('AlphaGEM costs ',str(t2-t1),' seconds')
-

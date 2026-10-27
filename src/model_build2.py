@@ -1,3 +1,4 @@
+from src.gpr_transfer import has_gene_token, replace_gene_token
 import cobra
 import pandas as pd
 from tqdm import tqdm
@@ -7,12 +8,12 @@ def str_chanege_for_gpr(old_gpr,oldgene,newgenes):
     oldgprcell=old_gpr.split(' or ')
     gprcell=[]
     for a in oldgprcell:
-        if oldgene in a:
+        if has_gene_token(a, oldgene):
             for genes in newgenes:
                 if 'and' in a:
-                    gprcell.append('('+a.replace(oldgene,genes).replace('(','').replace(')','')+')')
+                    gprcell.append('('+replace_gene_token(a, oldgene, genes).replace('(','').replace(')','')+')')
                 else:
-                    gprcell.append(a.replace(oldgene, genes).replace('(', '').replace(')', ''))
+                    gprcell.append(replace_gene_token(a, oldgene, genes).replace('(', '').replace(')', ''))
         else:
             if 'and' in a:
                 gprcell.append('('+a.replace('(','').replace(')','')+')')
