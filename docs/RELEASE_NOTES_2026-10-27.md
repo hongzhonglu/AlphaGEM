@@ -27,8 +27,8 @@ SQLite annotation catalogue and specificity backend are not included.
 - Resource files: **21,949**; uncompressed bytes: **9,276,816,548**.
 - SHA-256: `c97fff632a12c76522e5cf109bef582e18f6bc76efeb3d417fbafa4083816283`.
 
-The matching checksum is committed at the repository root. The download URL
-will be added after the maintainer uploads the file. See
+Download the bundle from [Google Drive](https://drive.google.com/file/d/1-Te8n0j8H6wo2hN9Aemw9hg9q4nNTClJ/view?usp=sharing).
+The matching checksum is committed at the repository root. See
 [RESOURCE_INSTALLATION.md](RESOURCE_INSTALLATION.md) for contents and commands.
 Large downloadable eggNOG databases, generated indexes, target-species results
 and experimental annotation resources are excluded. Required trained models,

@@ -11,9 +11,11 @@ You can install AlphaGEM through git
    
     git clone https://github.com/hongzhonglu/AlphaGEM.git AlphaGEM
 
-Use the **2026-10-27 runtime resource bundle** matching
-`data_source.tar.xz.sha256` in this checkout. Its new download link will be added
-after upload. The [previous Figshare bundle](https://dx.doi.org/10.6084/m9.figshare.30630524)
+Download the **latest runtime resource bundle (2026-10-27)**:
+[data_source.tar.xz — Google Drive, 2.75 GB](https://drive.google.com/file/d/1-Te8n0j8H6wo2hN9Aemw9hg9q4nNTClJ/view?usp=sharing).
+Place it in the repository root and verify it against
+`data_source.tar.xz.sha256` in this checkout before extraction.
+The [previous Figshare bundle](https://dx.doi.org/10.6084/m9.figshare.30630524)
 is an older snapshot and does not match this update.
 
 See [resource extraction, verification and tool database installation](docs/RESOURCE_INSTALLATION.md).

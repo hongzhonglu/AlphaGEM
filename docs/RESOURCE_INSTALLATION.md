@@ -1,8 +1,10 @@
 # Runtime resources
 
-Use the resource bundle matching `data_source.tar.xz.sha256` in this checkout.
-The previous Figshare bundle has a different checksum; the updated download link
-will be added after the new file is uploaded. Do not substitute the old bundle
+Download the [latest runtime resource bundle (2026-10-27),
+data_source.tar.xz — Google Drive, 2.75 GB](https://drive.google.com/file/d/1-Te8n0j8H6wo2hN9Aemw9hg9q4nNTClJ/view?usp=sharing)
+and place it in the repository root. Verify it against
+`data_source.tar.xz.sha256` in this checkout before extraction.
+The previous Figshare bundle has a different checksum; do not substitute it
 for this snapshot.
 
 ```bash
